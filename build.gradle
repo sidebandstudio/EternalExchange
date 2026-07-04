@@ -1,5 +1,5 @@
 plugins {
-	id 'net.fabricmc.fabric-loom' version "${loom_version}"
+	id 'fabric-loom' version "${loom_version}"
 	id 'maven-publish'
 }
 
@@ -46,6 +46,15 @@ dependencies {
 
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+	// javax.annotation (JSR-305), provided by NeoForge but not Fabric; upstream sources use it
+	compileOnly "com.google.code.findbugs:jsr305:3.0.2"
+
+	// TOML config backend; same library NeoForge uses, so upstream config files stay compatible
+	implementation "com.electronwill.night-config:core:${project.night_config_version}"
+	implementation "com.electronwill.night-config:toml:${project.night_config_version}"
+	include "com.electronwill.night-config:core:${project.night_config_version}"
+	include "com.electronwill.night-config:toml:${project.night_config_version}"
 
 	testImplementation "org.junit.jupiter:junit-jupiter:${project.junit_version}"
 	testRuntimeOnly "org.junit.platform:junit-platform-launcher"
