@@ -1,0 +1,38 @@
+{
+	"schemaVersion": 1,
+	"id": "projecte",
+	"version": "${version}",
+	"name": "ProjectE",
+	"description": "A complete rewrite of EE2 for modern Minecraft versions. Unofficial Fabric port (EternalValue) of ProjectE by sinkillerj et al. (MIT).",
+	"authors": [
+		"SinKillerJ",
+		"MaPePeR",
+		"williewillus",
+		"Lilylicious",
+		"pupnewfster"
+	],
+	"contact": {
+		"homepage": "https://github.com/sinkillerj/ProjectE",
+		"sources": "https://github.com/sinkillerj/ProjectE"
+	},
+	"license": "MIT",
+	"icon": "logo.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"moze_intel.projecte.PECore"
+		],
+		"client": [
+			"moze_intel.projecte.client.PEClient"
+		]
+	},
+	"mixins": [
+		"projecte.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.0",
+		"fabric-api": "*",
+		"minecraft": "1.21.1",
+		"java": ">=21"
+	}
+}
