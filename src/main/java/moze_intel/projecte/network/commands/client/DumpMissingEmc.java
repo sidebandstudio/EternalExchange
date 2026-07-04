@@ -93,7 +93,7 @@ public class DumpMissingEmc {
 		Minecraft minecraft = Minecraft.getInstance();
 		//TODO - 1.21.4: upstream plans to use a data map for this (NeoForge PR 1928)
 		FeatureFlagSet features = minecraft.getConnection() == null ? FeatureFlags.DEFAULT_FLAGS : minecraft.getConnection().enabledFeatures();
-		CreativeModeTab tab = registryAccess.holderOrThrow(CreativeModeTabs.SEARCH).value();
+		CreativeModeTab tab = registryAccess.registryOrThrow(net.minecraft.core.registries.Registries.CREATIVE_MODE_TAB).getOrThrow(CreativeModeTabs.SEARCH);
 		if (tab.getSearchTabDisplayItems().isEmpty()) {
 			//If the search tab hasn't been initialized yet initialize it
 			boolean hasPermissions = minecraft.options.operatorItemsTab().get();
@@ -130,7 +130,7 @@ public class DumpMissingEmc {
 		}
 		//Check all items in the search tab to see if they have an EMC value (as they may have data component variants declared)
 		for (ItemStack stack : tab.getSearchTabDisplayItems()) {
-			if (!stack.isEmpty() && !stack.isComponentsPatchEmpty()) {
+			if (!stack.isEmpty() && !stack.getComponentsPatch().isEmpty()) {
 				//If the stack is not empty, and it has non defaulted components: see if any of the added variants have EMC
 				ItemInfo itemInfo = ItemInfo.fromStack(stack);
 				if (IEMCProxy.INSTANCE.hasValue(itemInfo)) {

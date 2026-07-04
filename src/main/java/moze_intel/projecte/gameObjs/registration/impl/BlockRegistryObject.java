@@ -1,5 +1,6 @@
 package moze_intel.projecte.gameObjs.registration.impl;
 
+import moze_intel.projecte.gameObjs.registration.PEDeferredHolder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import moze_intel.projecte.gameObjs.registration.DoubleWrappedRegistryObject;
 import moze_intel.projecte.utils.text.IHasTranslationKey;

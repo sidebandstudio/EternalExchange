@@ -158,6 +158,15 @@ public class PECore implements ModInitializer {
 		//Commands
 		CommandRegistrationCallback.EVENT.register((dispatcher, context, environment) -> registerCommands(dispatcher, context));
 
+		//Fabric port: replaces NeoForge's onItemUseFirst hook for the philosopher's stone (must run before block interactions)
+		net.fabricmc.fabric.api.event.player.UseBlockCallback.EVENT.register((player, level, hand, hitResult) -> {
+			ItemStack stack = player.getItemInHand(hand);
+			if (!stack.isEmpty() && stack.getItem() instanceof moze_intel.projecte.gameObjs.items.PhilosophersStone stone) {
+				return stone.onItemUseFirst(stack, new UseOnContext(player, hand, hitResult));
+			}
+			return net.minecraft.world.InteractionResult.PASS;
+		});
+
 		//World transmutation reload listener
 		ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new IdentifiableResourceReloadListener() {
 			@Override
@@ -206,7 +215,7 @@ public class PECore implements ModInitializer {
 		AbstractNSSTag.clearCreatedTags();
 		CustomEMCParser.init(server.registryAccess());
 		try {
-			EMCMappingHandler.map(server.getServerResources().managers(), server.registryAccess(), server.getResourceManager());
+			EMCMappingHandler.map(server.resources.managers(), server.registryAccess(), server.getResourceManager());
 			LOGGER.info("Registered {} EMC values. (took {} ms)", EMCMappingHandler.getEmcMapSize(), System.currentTimeMillis() - start);
 		} catch (Throwable t) {
 			LOGGER.error("Error calculating EMC values", t);

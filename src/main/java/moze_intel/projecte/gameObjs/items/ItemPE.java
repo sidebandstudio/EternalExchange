@@ -17,13 +17,9 @@ public class ItemPE extends Item {
 	}
 
 	@Override
-	public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
-		if (oldStack.getItem() != newStack.getItem()) {
-			return true;
-		} else if (oldStack.getOrDefault(PEDataComponentTypes.ACTIVE, false) != newStack.getOrDefault(PEDataComponentTypes.ACTIVE, false)) {
-			return true;
-		}
-		return this instanceof IModeChanger<?> modeChanger && !modeMatches(modeChanger, oldStack, newStack);
+	public boolean allowComponentsUpdateAnimation(net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand, ItemStack oldStack, ItemStack newStack) {
+		//Fabric port: replaces shouldCauseReequipAnimation — EMC/charge component changes shouldn't replay the equip animation
+		return false;
 	}
 
 	private static <MODE> boolean modeMatches(IModeChanger<MODE> modeChanger, ItemStack oldStack, ItemStack newStack) {
@@ -32,7 +28,7 @@ public class ItemPE extends Item {
 
 	@Range(from = 0, to = Long.MAX_VALUE)
 	private static long getEmc(ItemStack stack) {
-		return stack.getOrDefault(PEDataComponentTypes.STORED_EMC, 0L);
+		return stack.getOrDefault(PEDataComponentTypes.STORED_EMC.get(), 0L);
 	}
 
 	public static void removeEmc(ItemStack stack, float amount) {
@@ -41,7 +37,7 @@ public class ItemPE extends Item {
 
 	public static void removeEmc(ItemStack stack, @Range(from = 0, to = Long.MAX_VALUE) long amount) {
 		if (amount > 0) {
-			stack.update(PEDataComponentTypes.STORED_EMC, 0L, amount, (emc, change) -> Math.max(emc - change, 0));
+			stack.update(PEDataComponentTypes.STORED_EMC.get(), 0L, amount, (emc, change) -> Math.max(emc - change, 0));
 		}
 	}
 
@@ -91,7 +87,7 @@ public class ItemPE extends Item {
 			current -= amount;
 		}
 		if (updateEmc) {
-			stack.set(PEDataComponentTypes.STORED_EMC, current);
+			stack.set(PEDataComponentTypes.STORED_EMC.get(), current);
 		}
 		return true;
 	}

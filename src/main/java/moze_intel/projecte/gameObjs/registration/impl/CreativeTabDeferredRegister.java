@@ -39,7 +39,7 @@ public class CreativeTabDeferredRegister extends PEDeferredRegister<CreativeMode
 	 */
 	public PEDeferredHolder<CreativeModeTab, CreativeModeTab> register(String name, ILangEntry title, ItemLike icon, UnaryOperator<CreativeModeTab.Builder> operator) {
 		return register(name, () -> {
-			CreativeModeTab.Builder builder = CreativeModeTab.builder()
+			CreativeModeTab.Builder builder = net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup.builder()
 					.title(title.translate())
 					.icon(() -> icon.asItem().getDefaultInstance());
 			return operator.apply(builder).build();

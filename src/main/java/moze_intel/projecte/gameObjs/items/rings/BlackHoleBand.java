@@ -55,7 +55,8 @@ public class BlackHoleBand extends PEToggleItem implements IAlchBagItem, IAlchCh
 		BlockPos fluidPos = result.getBlockPos();
 		BlockState state = level.getBlockState(fluidPos);
 		if (level.mayInteract(player, fluidPos) && player.mayUseItemAt(fluidPos, result.getDirection(), stack) && state.getBlock() instanceof BucketPickup pickup) {
-			Optional<SoundEvent> sound = pickup.getPickupSound(state);
+			//Fabric port: vanilla getPickupSound has no BlockState overload (that was a NeoForge extension)
+			Optional<SoundEvent> sound = pickup.getPickupSound();
 			ItemStack itemStack = pickup.pickupBlock(player, level, fluidPos, state);
 			if (!itemStack.isEmpty()) {
 				//noinspection OptionalIsPresent - Capturing lambda

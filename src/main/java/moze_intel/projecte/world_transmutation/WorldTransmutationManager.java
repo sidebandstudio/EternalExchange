@@ -64,8 +64,8 @@ public class WorldTransmutationManager extends SimpleJsonResourceReloadListener 
 
 	@Override
 	protected void apply(@NotNull Map<ResourceLocation, JsonElement> object, @NotNull ResourceManager resourceManager, @NotNull ProfilerFiller profiler) {
-		//Ensure we are interacting with the condition context
-		RegistryOps<JsonElement> registryOps = makeConditionalOps();
+		//Fabric port: conditions are ignored on load and the codecs only use static registries, so plain JSON ops suffice
+		com.mojang.serialization.DynamicOps<JsonElement> registryOps = com.mojang.serialization.JsonOps.INSTANCE;
 		Reference2ObjectMap<Block, SequencedSet<IWorldTransmutation>> builder = new Reference2ObjectLinkedOpenHashMap<>();
 
 		// Find all data/<domain>/pe_world_transmutations/foo/bar.json

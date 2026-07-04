@@ -19,7 +19,6 @@ import moze_intel.projecte.utils.PlayerHelper;
 import moze_intel.projecte.utils.ToolHelper;
 import moze_intel.projecte.utils.text.IHasTranslationKey;
 import moze_intel.projecte.utils.text.PELang;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -171,20 +170,34 @@ public class PEKatar extends PETool implements IItemMode<KatarMode>, IExtraFunct
 		ToolHelper.applyChargeAttributes(event);
 	}
 
+	@Override
+	public boolean changeCharge(@NotNull Player player, @NotNull ItemStack stack, @Nullable InteractionHand hand) {
+		if (super.changeCharge(player, stack, hand)) {
+			//Fabric port: no per stack attribute event on Fabric; rebuild the charge based modifiers when the charge changes
+			ItemAttributeModifierEvent event = new ItemAttributeModifierEvent(stack);
+			adjustAttributes(event);
+			event.apply();
+			if (!stack.has(DataComponents.ATTRIBUTE_MODIFIERS)) {
+				//Fabric port: apply() masked the item's default component when clearing; restore the tool's base attributes
+				stack.set(DataComponents.ATTRIBUTE_MODIFIERS, components().getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY));
+			}
+			return true;
+		}
+		return false;
+	}
+
 	/**
 	 * Copy of {@link net.minecraft.world.item.ShearsItem#interactLivingEntity(ItemStack, Player, LivingEntity, InteractionHand)}
 	 */
 	@NotNull
 	@Override
 	public InteractionResult interactLivingEntity(@NotNull ItemStack stack, @NotNull Player player, @NotNull LivingEntity entity, @NotNull InteractionHand hand) {
-		if (entity instanceof IShearable target) {
-			BlockPos pos = entity.blockPosition();
+		//Fabric port: NeoForge's IShearable extension replaced with vanilla Shearable (shear() spawns the drops itself)
+		if (entity instanceof Shearable target) {
 			Level level = entity.level();
-			if (target.isShearable(player, stack, level, pos)) {
+			if (target.readyForShearing()) {
 				if (!level.isClientSide) {
-					for (ItemStack drop : target.onSheared(player, stack, level, pos)) {
-						target.spawnShearedDrop(level, pos, drop);
-					}
+					target.shear(SoundSource.PLAYERS);
 					entity.gameEvent(GameEvent.SHEAR, player);
 				}
 				return InteractionResult.sidedSuccess(level.isClientSide);

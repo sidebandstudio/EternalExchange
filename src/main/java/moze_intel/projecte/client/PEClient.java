@@ -42,7 +42,7 @@ import net.minecraft.client.renderer.entity.TippableArrowRenderer;
 import net.minecraft.client.renderer.entity.TntRenderer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.renderer.item.ItemProperties;
-import net.minecraft.client.renderer.item.ItemPropertyFunction;
+import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ItemLike;
@@ -89,7 +89,8 @@ public class PEClient implements ClientModInitializer {
 
 	private static void registerScreens() {
 		MenuScreens.register(PEContainerTypes.RM_FURNACE_CONTAINER.get(), GUIRMFurnace::new);
-		MenuScreens.register(PEContainerTypes.DM_FURNACE_CONTAINER.get(), GUIDMFurnace::new);
+		//noinspection RedundantTypeArguments (necessary for it to actually compile)
+		MenuScreens.<moze_intel.projecte.gameObjs.container.DMFurnaceContainer, GUIDMFurnace<moze_intel.projecte.gameObjs.container.DMFurnaceContainer>>register(PEContainerTypes.DM_FURNACE_CONTAINER.get(), GUIDMFurnace::new);
 		MenuScreens.register(PEContainerTypes.CONDENSER_CONTAINER.get(), AbstractCondenserScreen.MK1::new);
 		MenuScreens.register(PEContainerTypes.CONDENSER_MK2_CONTAINER.get(), AbstractCondenserScreen.MK2::new);
 		MenuScreens.register(PEContainerTypes.ALCH_CHEST_CONTAINER.get(), AlchChestScreen::new);
@@ -138,7 +139,7 @@ public class PEClient implements ClientModInitializer {
 	}
 
 	@SuppressWarnings("deprecation")
-	private static void addPropertyOverrides(ResourceLocation override, ItemPropertyFunction propertyGetter, ItemLike... itemProviders) {
+	private static void addPropertyOverrides(ResourceLocation override, ClampedItemPropertyFunction propertyGetter, ItemLike... itemProviders) {
 		for (ItemLike itemProvider : itemProviders) {
 			ItemProperties.register(itemProvider.asItem(), override, propertyGetter);
 		}

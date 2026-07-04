@@ -26,13 +26,23 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.GrassBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import java.util.Set;
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import moze_intel.projecte.compat.ItemAbilities;
 import moze_intel.projecte.compat.ItemAbility;
-import net.neoforged.neoforge.common.Tags;
+import moze_intel.projecte.compat.ItemAbilityHelper;
 import moze_intel.projecte.compat.events.ItemAttributeModifierEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class PEMorningStar extends PETool implements IItemMode<PickaxeMode>, IHasConditionalAttributes {
+public class PEMorningStar extends PETool implements IItemMode<PickaxeMode>, IHasConditionalAttributes, ItemAbilityHelper.AbilityAware {
+
+	//Fabric port: inlined copy of NeoForge's ItemAbilities.DEFAULT_PICKAXE/SHOVEL_ACTIONS sets (the compat shim only defines the individual abilities)
+	private static final Set<ItemAbility> VANILLA_TOOL_ACTIONS = Set.of(
+			ItemAbilities.PICKAXE_DIG,
+			ItemAbilities.SHOVEL_DIG, ItemAbilities.SHOVEL_FLATTEN);
 
 	public PEMorningStar(IMatterType matterType, int numCharges, Properties props) {
 		super(matterType, PETags.Blocks.MINEABLE_WITH_PE_MORNING_STAR, numCharges, props.attributes(createAttributes(matterType, 16, -3))
@@ -48,7 +58,7 @@ public class PEMorningStar extends PETool implements IItemMode<PickaxeMode>, IHa
 
 	@Override
 	public boolean canPerformAction(@NotNull ItemStack stack, @NotNull ItemAbility toolAction) {
-		return ItemAbilities.DEFAULT_PICKAXE_ACTIONS.contains(toolAction) || ItemAbilities.DEFAULT_SHOVEL_ACTIONS.contains(toolAction) ||
+		return VANILLA_TOOL_ACTIONS.contains(toolAction) ||
 			   ToolHelper.DEFAULT_PE_HAMMER_ACTIONS.contains(toolAction) || ToolHelper.DEFAULT_PE_MORNING_STAR_ACTIONS.contains(toolAction);
 	}
 
@@ -86,7 +96,7 @@ public class PEMorningStar extends PETool implements IItemMode<PickaxeMode>, IHa
 					}
 					return InteractionResult.PASS;
 				}, (ctx, state) -> {
-					if (state.is(Tags.Blocks.ORES) && !ProjectEConfig.server.items.pickaxeAoeVeinMining.get()) {
+					if (state.is(ConventionalBlockTags.ORES) && !ProjectEConfig.server.items.pickaxeAoeVeinMining.get()) {
 						return ToolHelper.tryVeinMine(ctx.getPlayer(), ctx.getItemInHand(), ctx.getClickedPos(), ctx.getClickedFace());
 					}
 					return InteractionResult.PASS;
@@ -112,6 +122,22 @@ public class PEMorningStar extends PETool implements IItemMode<PickaxeMode>, IHa
 	@Override
 	public void adjustAttributes(ItemAttributeModifierEvent event) {
 		ToolHelper.applyChargeAttributes(event);
+	}
+
+	@Override
+	public boolean changeCharge(@NotNull Player player, @NotNull ItemStack stack, @Nullable InteractionHand hand) {
+		if (super.changeCharge(player, stack, hand)) {
+			//Fabric port: no per stack attribute event on Fabric; rebuild the charge based modifiers when the charge changes
+			ItemAttributeModifierEvent event = new ItemAttributeModifierEvent(stack);
+			adjustAttributes(event);
+			event.apply();
+			if (!stack.has(DataComponents.ATTRIBUTE_MODIFIERS)) {
+				//Fabric port: apply() masked the item's default component when clearing; restore the tool's base attributes
+				stack.set(DataComponents.ATTRIBUTE_MODIFIERS, components().getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY));
+			}
+			return true;
+		}
+		return false;
 	}
 
 	@Override

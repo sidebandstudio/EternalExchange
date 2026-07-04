@@ -24,12 +24,12 @@ public class TransmutationProxyImpl implements ITransmutationProxy {
 			MinecraftServer server = Objects.requireNonNull(ServerLifecycleHooks.getCurrentServer(), "Server must be running to query knowledge!");
 			Player player = server.getPlayerList().getPlayer(playerUUID);
 			if (player != null) {
-				return PECapabilities.KNOWLEDGE_CAPABILITY.find(Objects.requireNonNull(player, null));
+				return PECapabilities.KNOWLEDGE_CAPABILITY.find(Objects.requireNonNull(player), null);
 			}
 			return TransmutationOffline.forPlayer(server, playerUUID);
 		} else if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
 			Objects.requireNonNull(Minecraft.getInstance().player, "Client player doesn't exist!");
-			return PECapabilities.KNOWLEDGE_CAPABILITY.find(Objects.requireNonNull(Minecraft.getInstance().player, null));
+			return PECapabilities.KNOWLEDGE_CAPABILITY.find(Objects.requireNonNull(Minecraft.getInstance().player), null);
 		}
 		throw new IllegalStateException("unreachable");
 	}

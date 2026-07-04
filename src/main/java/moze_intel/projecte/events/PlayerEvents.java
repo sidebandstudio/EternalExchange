@@ -88,7 +88,7 @@ public class PlayerEvents {
 	 * @return true if vanilla pickup should be cancelled
 	 */
 	public static boolean onItemPickup(ItemEntity itemEntity, Player player) {
-		if (itemEntity.level().isClientSide || itemEntity.hasPickUpDelay() || itemEntity.getTarget() != null && !player.getUUID().equals(itemEntity.getTarget())) {
+		if (itemEntity.level().isClientSide || itemEntity.hasPickUpDelay() || itemEntity.target != null && !player.getUUID().equals(itemEntity.target)) {
 			return false;
 		}
 		ItemStack bag = AlchemicalBag.getFirstBagWithSuctionItem(player, player.getInventory().items);

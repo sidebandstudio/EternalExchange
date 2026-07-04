@@ -52,12 +52,4 @@ public class PedestalRenderer implements BlockEntityRenderer<DMPedestalBlockEnti
 		}
 	}
 
-	@NotNull
-	@Override
-	public AABB getRenderBoundingBox(@NotNull DMPedestalBlockEntity pedestal) {
-		if (this.context.getEntityRenderer().shouldRenderHitBoxes()) {
-			return pedestal.getEffectBounds();
-		}
-		return BlockEntityRenderer.super.getRenderBoundingBox(pedestal);
-	}
 }

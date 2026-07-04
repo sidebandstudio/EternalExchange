@@ -27,8 +27,8 @@ public class PEAxe extends AxeItem implements IItemCharge, IBarHelper {
 
 	public PEAxe(IMatterType matterType, int numCharges, Properties props) {
 		super(matterType, props.attributes(createAttributes(matterType, 5, -3))
-				.component(PEDataComponentTypes.CHARGE, 0)
-				.component(PEDataComponentTypes.STORED_EMC, 0L)
+				.component(PEDataComponentTypes.CHARGE.get(), 0)
+				.component(PEDataComponentTypes.STORED_EMC.get(), 0L)
 		);
 		this.matterType = matterType;
 		this.numCharges = numCharges;
@@ -40,24 +40,11 @@ public class PEAxe extends AxeItem implements IItemCharge, IBarHelper {
 	}
 
 	@Override
-	public boolean isBookEnchantable(@NotNull ItemStack stack, @NotNull ItemStack book) {
+	public boolean canBeEnchantedWith(@NotNull ItemStack stack, @NotNull net.minecraft.core.Holder<Enchantment> enchantment, @NotNull net.fabricmc.fabric.api.item.v1.EnchantingContext context) {
+		//Fabric port: collapses NeoForge's isBookEnchantable/isPrimaryItemFor/supportsEnchantment
 		return false;
 	}
 
-	@Override
-	public boolean isPrimaryItemFor(@NotNull ItemStack stack, @NotNull Holder<Enchantment> enchantment) {
-		return false;
-	}
-
-	@Override
-	public boolean supportsEnchantment(@NotNull ItemStack stack, @NotNull Holder<Enchantment> enchantment) {
-		return false;
-	}
-
-	@Override
-	public <T extends LivingEntity> int damageItem(@NotNull ItemStack stack, int amount, T entity, @NotNull Consumer<Item> onBroken) {
-		return 0;
-	}
 
 	@Override
 	public boolean isBarVisible(@NotNull ItemStack stack) {

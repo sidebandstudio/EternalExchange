@@ -34,8 +34,8 @@ public class PEShears extends ShearsItem implements IItemCharge, IBarHelper {
 	private final int numCharges;
 
 	public PEShears(IMatterType matterType, int numCharges, Properties props) {
-		super(props.component(PEDataComponentTypes.CHARGE, 0)
-						.component(PEDataComponentTypes.STORED_EMC, 0L)
+		super(props.component(PEDataComponentTypes.CHARGE.get(), 0)
+						.component(PEDataComponentTypes.STORED_EMC.get(), 0L)
 						.component(DataComponents.TOOL, new Tool(List.of(
 								Tool.Rule.minesAndDrops(PETags.Blocks.MINEABLE_WITH_PE_SHEARS, matterType.getSpeed()),
 								Tool.Rule.overrideSpeed(BlockTags.LEAVES, 15.0F),
@@ -53,24 +53,11 @@ public class PEShears extends ShearsItem implements IItemCharge, IBarHelper {
 	}
 
 	@Override
-	public boolean isBookEnchantable(@NotNull ItemStack stack, @NotNull ItemStack book) {
+	public boolean canBeEnchantedWith(@NotNull ItemStack stack, @NotNull net.minecraft.core.Holder<Enchantment> enchantment, @NotNull net.fabricmc.fabric.api.item.v1.EnchantingContext context) {
+		//Fabric port: collapses NeoForge's isBookEnchantable/isPrimaryItemFor/supportsEnchantment
 		return false;
 	}
 
-	@Override
-	public boolean isPrimaryItemFor(@NotNull ItemStack stack, @NotNull Holder<Enchantment> enchantment) {
-		return false;
-	}
-
-	@Override
-	public boolean supportsEnchantment(@NotNull ItemStack stack, @NotNull Holder<Enchantment> enchantment) {
-		return false;
-	}
-
-	@Override
-	public <T extends LivingEntity> int damageItem(@NotNull ItemStack stack, int amount, T entity, @NotNull Consumer<Item> onBroken) {
-		return 0;
-	}
 
 	@Override
 	public boolean isBarVisible(@NotNull ItemStack stack) {

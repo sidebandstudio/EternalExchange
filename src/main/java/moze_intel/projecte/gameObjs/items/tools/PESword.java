@@ -33,18 +33,29 @@ public class PESword extends SwordItem implements IExtraFunction, IItemCharge, I
 	private final IMatterType matterType;
 	private final int numCharges;
 
+	//Fabric port: vanilla SwordItem has no (Tier, Properties, Tool) constructor and bakes the tier's TOOL component;
+	// overriding components() swaps in the custom tool rules instead
+	private final net.minecraft.core.component.DataComponentMap componentsWithTool;
+
 	public PESword(IMatterType matterType, int numCharges, int damage, Properties props) {
 		super(matterType, props.attributes(createAttributes(matterType, damage, -2.4F))
-				.component(PEDataComponentTypes.CHARGE, 0)
-				.component(PEDataComponentTypes.STORED_EMC, 0L),
-				new Tool(List.of(
+				.component(PEDataComponentTypes.CHARGE.get(), 0)
+				.component(PEDataComponentTypes.STORED_EMC.get(), 0L));
+		this.componentsWithTool = net.minecraft.core.component.DataComponentMap.composite(super.components(),
+				net.minecraft.core.component.DataComponentMap.builder().set(net.minecraft.core.component.DataComponents.TOOL, new Tool(List.of(
 						Tool.Rule.deniesDrops(matterType.getIncorrectBlocksForDrops()),
 						Tool.Rule.minesAndDrops(PETags.Blocks.MINEABLE_WITH_PE_SWORD, matterType.getSpeed()),
 						Tool.Rule.overrideSpeed(BlockTags.SWORD_EFFICIENT, 1.5F)
-				), 1.0F, 2)
-		);
+				), 1.0F, 2)).build());
 		this.matterType = matterType;
 		this.numCharges = numCharges;
+	}
+
+	@Override
+	@NotNull
+	public net.minecraft.core.component.DataComponentMap components() {
+		//Fabric port: see constructor note
+		return componentsWithTool == null ? super.components() : componentsWithTool;
 	}
 
 	@Override
@@ -53,24 +64,11 @@ public class PESword extends SwordItem implements IExtraFunction, IItemCharge, I
 	}
 
 	@Override
-	public boolean isBookEnchantable(@NotNull ItemStack stack, @NotNull ItemStack book) {
+	public boolean canBeEnchantedWith(@NotNull ItemStack stack, @NotNull net.minecraft.core.Holder<Enchantment> enchantment, @NotNull net.fabricmc.fabric.api.item.v1.EnchantingContext context) {
+		//Fabric port: collapses NeoForge's isBookEnchantable/isPrimaryItemFor/supportsEnchantment
 		return false;
 	}
 
-	@Override
-	public boolean isPrimaryItemFor(@NotNull ItemStack stack, @NotNull Holder<Enchantment> enchantment) {
-		return false;
-	}
-
-	@Override
-	public boolean supportsEnchantment(@NotNull ItemStack stack, @NotNull Holder<Enchantment> enchantment) {
-		return false;
-	}
-
-	@Override
-	public <T extends LivingEntity> int damageItem(@NotNull ItemStack stack, int amount, T entity, @NotNull Consumer<Item> onBroken) {
-		return 0;
-	}
 
 	@Override
 	public boolean isBarVisible(@NotNull ItemStack stack) {
@@ -108,8 +106,10 @@ public class PESword extends SwordItem implements IExtraFunction, IItemCharge, I
 		return true;
 	}
 
+	/**
+	 * Fabric port: NeoForge sweep-box hook; needs a Player#attack mixin to take effect.
+	 */
 	@NotNull
-	@Override
 	public AABB getSweepHitBox(@NotNull ItemStack stack, @NotNull Player player, @NotNull Entity target) {
 		int charge = getCharge(stack);
 		return target.getBoundingBox().inflate(charge, charge / 4D, charge);

@@ -22,8 +22,8 @@ public class TransmutationTablet extends ItemPE {
 	@NotNull
 	@Override
 	public InteractionResultHolder<ItemStack> use(@NotNull Level level, @NotNull Player player, @NotNull InteractionHand hand) {
-		if (!level.isClientSide) {
-			player.openMenu(new ContainerProvider(hand), buf -> {
+		if (!level.isClientSide && player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+			moze_intel.projecte.compat.network.PEMenuHelper.openMenu(serverPlayer, new ContainerProvider(hand), buf -> {
 				buf.writeBoolean(true);
 				buf.writeEnum(hand);
 				buf.writeByte(player.getInventory().selected);

@@ -52,6 +52,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import moze_intel.projecte.compat.items.IItemHandler;
 import moze_intel.projecte.compat.items.IItemHandlerModifiable;
+import moze_intel.projecte.compat.items.ItemHandler;
 import moze_intel.projecte.compat.network.PEMenuHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -106,7 +107,7 @@ public class MercurialEye extends ItemMode<MercurialEyeMode> implements IExtraFu
 	}
 
 	private InteractionResult formBlocks(ItemStack eye, Player player, InteractionHand hand, Level level, BlockPos startingPos, @Nullable Direction facing) {
-		IItemHandler inventory = getEyeInventory(eye);
+		IItemHandler inventory = ItemHandler.ITEM.find(eye, null);
 		if (inventory == null) {
 			return InteractionResult.FAIL;
 		}
@@ -271,7 +272,7 @@ public class MercurialEye extends ItemMode<MercurialEyeMode> implements IExtraFu
 		if (oldState == newState || oldState.hasBlockEntity()) {
 			return false;
 		}
-		IItemHandler inventory = getEyeInventory(eye);
+		IItemHandler inventory = ItemHandler.ITEM.find(eye, null);
 		if (inventory == null) {
 			return false;
 		}
@@ -343,14 +344,7 @@ public class MercurialEye extends ItemMode<MercurialEyeMode> implements IExtraFu
 
 	@Override
 	public void attachCapabilities() {
-		//Fabric port: no item handler ItemApiLookup shim exists yet for cross-mod exposure; the eye's inventory is accessed via getEyeInventory
-	}
-
-	/**
-	 * Fabric port: upstream exposed this as a NeoForge item capability; the container and this item construct it directly instead.
-	 */
-	public static IItemHandlerModifiable getEyeInventory(ItemStack stack) {
-		return new EyeItemHandler(stack);
+		ItemHandler.ITEM.registerForItems((stack, context) -> new EyeItemHandler(stack), this);
 	}
 
 	@Override

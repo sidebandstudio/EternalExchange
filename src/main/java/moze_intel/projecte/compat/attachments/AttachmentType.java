@@ -68,6 +68,10 @@ public final class AttachmentType<T> {
 		return new Builder<>(defaultCreator);
 	}
 
+	public static <T> Builder<T> builder(java.util.function.Supplier<T> defaultCreator) {
+		return new Builder<>(holder -> defaultCreator.get());
+	}
+
 	@FunctionalInterface
 	public interface CopyHandler<T> {
 

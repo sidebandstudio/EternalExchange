@@ -1,5 +1,7 @@
 package moze_intel.projecte.compat;
 
+import java.util.Set;
+
 /**
  * Fabric port shim: the standard NeoForge ability constants ProjectE references.
  */
@@ -25,4 +27,12 @@ public final class ItemAbilities {
 	public static final ItemAbility SHEARS_TRIM = ItemAbility.get("shears_trim");
 	public static final ItemAbility SWORD_SWEEP = ItemAbility.get("sword_sweep");
 	public static final ItemAbility FIRESTARTER_LIGHT = ItemAbility.get("firestarter_light");
+
+	//Default per-tool sets, mirroring NeoForge's ItemAbilities defaults
+	public static final Set<ItemAbility> DEFAULT_AXE_ACTIONS = Set.of(AXE_DIG, AXE_STRIP, AXE_SCRAPE, AXE_WAX_OFF);
+	public static final Set<ItemAbility> DEFAULT_HOE_ACTIONS = Set.of(HOE_DIG, HOE_TILL);
+	public static final Set<ItemAbility> DEFAULT_PICKAXE_ACTIONS = Set.of(PICKAXE_DIG);
+	public static final Set<ItemAbility> DEFAULT_SHOVEL_ACTIONS = Set.of(SHOVEL_DIG, SHOVEL_FLATTEN);
+	public static final Set<ItemAbility> DEFAULT_SWORD_ACTIONS = Set.of(SWORD_DIG, SWORD_SWEEP);
+	public static final Set<ItemAbility> DEFAULT_SHEARS_ACTIONS = Set.of(SHEARS_DIG, SHEARS_HARVEST, SHEARS_CARVE, SHEARS_TRIM);
 }

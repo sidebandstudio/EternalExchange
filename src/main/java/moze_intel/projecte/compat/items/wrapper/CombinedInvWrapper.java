@@ -9,6 +9,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public class CombinedInvWrapper implements IItemHandlerModifiable {
 
+	private static final IItemHandlerModifiable EMPTY = new moze_intel.projecte.compat.items.ItemStackHandler(0);
+
 	protected final IItemHandlerModifiable[] itemHandler;
 	//Index of the first slot after each handler
 	protected final int[] baseIndex;
@@ -38,6 +40,10 @@ public class CombinedInvWrapper implements IItemHandlerModifiable {
 
 	protected int getSlotFromIndex(int slot, int index) {
 		return index <= 0 ? slot : slot - baseIndex[index - 1];
+	}
+
+	protected IItemHandlerModifiable getHandlerFromIndex(int index) {
+		return index < 0 || index >= itemHandler.length ? EMPTY : itemHandler[index];
 	}
 
 	@Override

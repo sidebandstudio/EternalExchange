@@ -91,7 +91,7 @@ public class ShowBagCMD {
 	}
 
 	private static MenuProvider createContainer(ServerPlayer sender, ServerPlayer target, DyeColor color) {
-		IItemHandlerModifiable inv = (IItemHandlerModifiable) PECapabilities.ALCH_BAG_CAPABILITY.find(Objects.requireNonNull(target, null)).getBag(color);
+		IItemHandlerModifiable inv = (IItemHandlerModifiable) PECapabilities.ALCH_BAG_CAPABILITY.find(Objects.requireNonNull(target), null).getBag(color);
 		Component name = PELang.SHOWBAG_NAMED.translate(PEItems.getBag(color), target.getDisplayName());
 		return getContainer(sender, name, inv, false, () -> target.isAlive() && !target.hasDisconnected());
 	}
@@ -139,7 +139,7 @@ public class ShowBagCMD {
 				String attachmentsKey = playerDat.contains(PEAttachments.SAVED_DATA_KEY, Tag.TAG_COMPOUND) ? PEAttachments.SAVED_DATA_KEY : PEAttachments.NEOFORGE_SAVED_DATA_KEY;
 				if (playerDat.contains(attachmentsKey, Tag.TAG_COMPOUND)) {
 					CompoundTag attachmentData = playerDat.getCompound(attachmentsKey);
-					CompoundTag bagData = attachmentData.getCompound(PEAttachmentTypes.ALCHEMICAL_BAGS.getId().toString());
+					CompoundTag bagData = attachmentData.getCompound(PEAttachmentTypes.ALCHEMICAL_BAGS.id().toString());
 					RegistryOps<Tag> serializationContext = server.registryAccess().createSerializationContext(NbtOps.INSTANCE);
 					DataResult<AlchemicalBagAttachment> result = AlchemicalBagAttachment.CODEC.parse(serializationContext, bagData);
 					if (result.isSuccess()) {

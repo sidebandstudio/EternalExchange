@@ -45,7 +45,7 @@ public abstract class EntityNovaPrimed extends PrimedTnt {
 	}
 
 	@Override
-	public ItemStack getPickedResult(@NotNull HitResult target) {
+	public ItemStack getPickResult() {
 		return new ItemStack(getBlock());
 	}
 }

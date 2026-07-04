@@ -3,6 +3,7 @@ package moze_intel.projecte.gameObjs.registration.impl;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import moze_intel.projecte.gameObjs.registration.DoubleDeferredRegister;
+import moze_intel.projecte.gameObjs.registration.PEDeferredHolder;
 import moze_intel.projecte.gameObjs.registration.impl.BlockRegistryObject.WallOrFloorBlockRegistryObject;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
@@ -30,7 +31,7 @@ public class BlockDeferredRegister extends DoubleDeferredRegister<Block, Item> {
 			Function<BlockBehaviour.Properties, BLOCK> blockSupplier, Function<BlockBehaviour.Properties, WALL_BLOCK> wallBlockSupplier,
 			BlockBehaviour.Properties baseProperties) {
 		PEDeferredHolder<Block, BLOCK> primaryObject = primaryRegister.register(name, () -> blockSupplier.apply(baseProperties));
-		PEDeferredHolder<Block, WALL_BLOCK> wallObject = primaryRegister.register("wall_" + name, () -> wallBlockSupplier.apply(baseProperties.lootFrom(primaryObject)));
+		PEDeferredHolder<Block, WALL_BLOCK> wallObject = primaryRegister.register("wall_" + name, () -> wallBlockSupplier.apply(baseProperties.dropsLike(primaryObject.get())));
 		return new WallOrFloorBlockRegistryObject<>(primaryObject, wallObject, secondaryRegister.register(name, () -> new StandingAndWallBlockItem(primaryObject.get(), wallObject.get(),
 				new Item.Properties(), Direction.DOWN)));
 	}

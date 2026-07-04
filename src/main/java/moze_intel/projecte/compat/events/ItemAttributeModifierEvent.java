@@ -39,9 +39,11 @@ public class ItemAttributeModifierEvent {
 	public void apply() {
 		if (changed) {
 			stack.set(DataComponents.ATTRIBUTE_MODIFIERS, modifiers);
-		} else if (stack.has(DataComponents.ATTRIBUTE_MODIFIERS)) {
-			//Reset to item defaults when no conditional modifiers apply anymore
-			stack.remove(DataComponents.ATTRIBUTE_MODIFIERS);
+		} else {
+			//Reset to the item prototype's defaults when no conditional modifiers apply anymore (removing the
+			// component outright would also work, but setting the default keeps props.attributes(...) items intact)
+			stack.set(DataComponents.ATTRIBUTE_MODIFIERS,
+					stack.getItem().components().getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY));
 		}
 	}
 }

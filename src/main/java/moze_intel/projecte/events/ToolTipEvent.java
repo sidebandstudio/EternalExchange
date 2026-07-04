@@ -70,7 +70,7 @@ public class ToolTipEvent {
 			}
 		}
 
-		long value = current.getOrDefault(PEDataComponentTypes.STORED_EMC, 0L);
+		long value = current.getOrDefault(PEDataComponentTypes.STORED_EMC.get(), 0L);
 		if (value == 0) {
 			IItemEmcHolder emcHolder = PECapabilities.EMC_HOLDER_ITEM_CAPABILITY.find(current, null);
 			if (emcHolder != null) {

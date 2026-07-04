@@ -57,7 +57,7 @@ public class TransmutationRenderingOverlay implements LayeredDraw.Layer {
 				float green = (color >> 8 & 0xFF) / 255.0F;
 				float blue = (color & 0xFF) / 255.0F;
 				float alpha = (color >> 24 & 0xFF) / 255.0F;
-				TextureAtlasSprite sprite = mc.getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(properties.getStillTexture());
+				TextureAtlasSprite sprite = FluidVariantRendering.getSprite(FluidVariant.of(liquidBlock.fluid));
 				graphics.blit(1, 1, 0, 16, 16, sprite, red, green, blue, alpha);
 			} else {
 				//Just render it normally instead of with the given model as some block's don't render properly then as an item

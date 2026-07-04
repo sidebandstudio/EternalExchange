@@ -611,7 +611,9 @@ public final class WorldHelper {
 			TargetInfo targetInfo = frontier.poll();
 			BlockPos pos = targetInfo.pos();
 			BlockState state = targetInfo.state();
-			if (state.onDestroyedByPlayer(level, pos, player, true, level.getFluidState(pos))) {
+			//Fabric port: replicate the vanilla side of NeoForge's onDestroyedByPlayer
+			state.getBlock().playerWillDestroy(level, pos, state, player);
+			if (level.removeBlock(pos, false)) {
 				Block block = state.getBlock();
 				block.destroy(level, pos, state);
 				player.awardStat(Stats.BLOCK_MINED.get(block));

@@ -59,17 +59,13 @@ import org.jetbrains.annotations.NotNull;
 public class PhilosophersStone extends ItemMode<PhilosophersStoneMode> implements IProjectileShooter, IExtraFunction {
 
 	public PhilosophersStone(Properties props) {
-		super(props.component(PEDataComponentTypes.PHILOSOPHERS_STONE_MODE, PhilosophersStoneMode.CUBE), 4);
-	}
-
-	@Override
-	public boolean hasCraftingRemainingItem(@NotNull ItemStack stack) {
-		return true;
+		super(props.component(PEDataComponentTypes.PHILOSOPHERS_STONE_MODE.get(), PhilosophersStoneMode.CUBE), 4);
 	}
 
 	@NotNull
 	@Override
-	public ItemStack getCraftingRemainingItem(ItemStack stack) {
+	public ItemStack getRecipeRemainder(ItemStack stack) {
+		//Fabric port: collapses hasCraftingRemainingItem/getCraftingRemainingItem
 		return stack.copy();
 	}
 
@@ -77,8 +73,10 @@ public class PhilosophersStone extends ItemMode<PhilosophersStoneMode> implement
 		return getPlayerPOVHitResult(level, player, isSneaking ? ClipContext.Fluid.SOURCE_ONLY : ClipContext.Fluid.NONE);
 	}
 
+	/**
+	 * Fabric port: invoked from a UseBlockCallback registered in PECore (upstream: NeoForge's onItemUseFirst hook).
+	 */
 	@NotNull
-	@Override
 	public InteractionResult onItemUseFirst(@NotNull ItemStack stack, @NotNull UseOnContext ctx) {
 		//Note: We use this instead of useOn so that we can support blocks that have right click interactions (for example signs)
 		Level level = ctx.getLevel();

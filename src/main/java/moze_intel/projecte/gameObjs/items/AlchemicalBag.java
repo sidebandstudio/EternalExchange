@@ -33,8 +33,8 @@ public class AlchemicalBag extends ItemPE {
 	@NotNull
 	@Override
 	public InteractionResultHolder<ItemStack> use(@NotNull Level level, @NotNull Player player, @NotNull InteractionHand hand) {
-		if (!level.isClientSide) {
-			player.openMenu(new ContainerProvider(player.getItemInHand(hand), hand), buf -> {
+		if (!level.isClientSide && player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+			moze_intel.projecte.compat.network.PEMenuHelper.openMenu(serverPlayer, new ContainerProvider(player.getItemInHand(hand), hand), buf -> {
 				buf.writeEnum(hand);
 				buf.writeByte(player.getInventory().selected);
 				buf.writeBoolean(false);
@@ -59,7 +59,7 @@ public class AlchemicalBag extends ItemPE {
 				for (int i = 0; i < inv.getSlots(); i++) {
 					ItemStack ring = inv.getStackInSlot(i);
 					if (!ring.isEmpty() && (ring.is(PEItems.BLACK_HOLE_BAND) || ring.is(PEItems.VOID_RING))) {
-						if (ring.getOrDefault(PEDataComponentTypes.ACTIVE, false)) {
+						if (ring.getOrDefault(PEDataComponentTypes.ACTIVE.get(), false)) {
 							return stack;
 						}
 					}
@@ -82,7 +82,7 @@ public class AlchemicalBag extends ItemPE {
 		@NotNull
 		@Override
 		public AbstractContainerMenu createMenu(int windowId, @NotNull Inventory playerInventory, @NotNull Player player) {
-			IItemHandlerModifiable inv = (IItemHandlerModifiable) PECapabilities.ALCH_BAG_CAPABILITY.find(Objects.requireNonNull(player, null)).getBag(color);
+			IItemHandlerModifiable inv = (IItemHandlerModifiable) PECapabilities.ALCH_BAG_CAPABILITY.find(Objects.requireNonNull(player), null).getBag(color);
 			return new AlchBagContainer(windowId, playerInventory, hand, inv, playerInventory.selected, false);
 		}
 

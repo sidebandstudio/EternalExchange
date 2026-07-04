@@ -24,24 +24,11 @@ public abstract class PEArmor extends ArmorItem {
 	}
 
 	@Override
-	public boolean isBookEnchantable(@NotNull ItemStack stack, @NotNull ItemStack book) {
+	public boolean canBeEnchantedWith(@NotNull ItemStack stack, @NotNull net.minecraft.core.Holder<Enchantment> enchantment, @NotNull net.fabricmc.fabric.api.item.v1.EnchantingContext context) {
+		//Fabric port: collapses NeoForge's isBookEnchantable/isPrimaryItemFor/supportsEnchantment
 		return false;
 	}
 
-	@Override
-	public boolean isPrimaryItemFor(@NotNull ItemStack stack, @NotNull Holder<Enchantment> enchantment) {
-		return false;
-	}
-
-	@Override
-	public boolean supportsEnchantment(@NotNull ItemStack stack, @NotNull Holder<Enchantment> enchantment) {
-		return false;
-	}
-
-	@Override
-	public <T extends LivingEntity> int damageItem(@NotNull ItemStack stack, int amount, T entity, @NotNull Consumer<Item> onBroken) {
-		return 0;
-	}
 
 	/**
 	 * Minimum percent damage will be reduced to if the full set is worn

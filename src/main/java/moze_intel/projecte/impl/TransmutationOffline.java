@@ -72,7 +72,7 @@ public class TransmutationOffline {
 				String attachmentsKey = playerDat.contains(PEAttachments.SAVED_DATA_KEY, Tag.TAG_COMPOUND) ? PEAttachments.SAVED_DATA_KEY : PEAttachments.NEOFORGE_SAVED_DATA_KEY;
 				if (playerDat.contains(attachmentsKey, Tag.TAG_COMPOUND)) {
 					CompoundTag attachmentData = playerDat.getCompound(attachmentsKey);
-					CompoundTag knowledgeData = attachmentData.getCompound(PEAttachmentTypes.KNOWLEDGE.getId().toString());
+					CompoundTag knowledgeData = attachmentData.getCompound(PEAttachmentTypes.KNOWLEDGE.id().toString());
 					RegistryOps<Tag> serializationContext = server.registryAccess().createSerializationContext(NbtOps.INSTANCE);
 					DataResult<KnowledgeAttachment> result = KnowledgeAttachment.CODEC.parse(serializationContext, knowledgeData);
 					if (result.isSuccess()) {

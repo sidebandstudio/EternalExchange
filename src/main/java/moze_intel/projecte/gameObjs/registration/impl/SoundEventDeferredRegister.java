@@ -3,9 +3,7 @@ package moze_intel.projecte.gameObjs.registration.impl;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import moze_intel.projecte.gameObjs.registration.PEDeferredRegister;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import org.jetbrains.annotations.NotNull;
@@ -34,9 +32,4 @@ public class SoundEventDeferredRegister extends PEDeferredRegister<SoundEvent> {
 		return (SoundEventRegistryObject<SOUND>) super.register(name, sup);
 	}
 
-	@NotNull
-	@Override
-	protected <SOUND extends SoundEvent> SoundEventRegistryObject<SOUND> createHolder(@NotNull ResourceKey<? extends Registry<SoundEvent>> registryKey, @NotNull ResourceLocation key) {
-		return new SoundEventRegistryObject<>(ResourceKey.create(registryKey, key));
-	}
 }

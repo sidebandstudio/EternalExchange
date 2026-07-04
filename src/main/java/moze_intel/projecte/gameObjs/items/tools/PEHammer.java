@@ -15,7 +15,7 @@ import moze_intel.projecte.compat.ItemAbility;
 import moze_intel.projecte.compat.events.ItemAttributeModifierEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class PEHammer extends PETool implements IHasConditionalAttributes {
+public class PEHammer extends PETool implements IHasConditionalAttributes, moze_intel.projecte.compat.ItemAbilityHelper.AbilityAware {
 
 	public PEHammer(IMatterType matterType, int numCharges, Properties props) {
 		super(matterType, PETags.Blocks.MINEABLE_WITH_PE_HAMMER, numCharges, props.attributes(createAttributes(matterType, 10, -3)));
@@ -27,7 +27,6 @@ public class PEHammer extends PETool implements IHasConditionalAttributes {
 		return true;
 	}
 
-	@Override
 	public boolean canPerformAction(@NotNull ItemStack stack, @NotNull ItemAbility toolAction) {
 		return ItemAbilities.DEFAULT_PICKAXE_ACTIONS.contains(toolAction) || ToolHelper.DEFAULT_PE_HAMMER_ACTIONS.contains(toolAction);
 	}
