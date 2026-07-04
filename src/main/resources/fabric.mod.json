@@ -2,8 +2,8 @@
 	"schemaVersion": 1,
 	"id": "projecte",
 	"version": "${version}",
-	"name": "ProjectE",
-	"description": "A complete rewrite of EE2 for modern Minecraft versions. Unofficial Fabric port (EternalValue) of ProjectE by sinkillerj et al. (MIT).",
+	"name": "EternalValuePE",
+	"description": "EternalValuePE: a Fabric port of ProjectE (a complete rewrite of EE2 for modern Minecraft versions) by sinkillerj et al., MIT.",
 	"authors": [
 		"SinKillerJ",
 		"MaPePeR",
