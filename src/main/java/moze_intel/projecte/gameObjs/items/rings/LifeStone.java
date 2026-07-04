@@ -8,7 +8,6 @@ import moze_intel.projecte.config.ProjectEConfig;
 import moze_intel.projecte.gameObjs.items.ICapabilityAware;
 import moze_intel.projecte.gameObjs.registries.PEDataComponentTypes;
 import moze_intel.projecte.gameObjs.registries.PESoundEvents;
-import moze_intel.projecte.integration.IntegrationHelper;
 import moze_intel.projecte.utils.MathUtils;
 import moze_intel.projecte.utils.PlayerHelper;
 import moze_intel.projecte.utils.text.PELang;
@@ -23,13 +22,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class LifeStone extends PEToggleItem implements IPedestalItem, ICapabilityAware {
 
 	public LifeStone(Properties props) {
-		super(props.component(PEDataComponentTypes.STORED_EMC, 0L));
+		super(props.component(PEDataComponentTypes.STORED_EMC.get(), 0L));
 	}
 
 	@Override
@@ -38,7 +36,7 @@ public class LifeStone extends PEToggleItem implements IPedestalItem, ICapabilit
 		if (level.isClientSide || !hotBarOrOffHand(slot) || !(entity instanceof Player player)) {
 			return;
 		}
-		if (stack.getOrDefault(PEDataComponentTypes.ACTIVE, false)) {
+		if (stack.getOrDefault(PEDataComponentTypes.ACTIVE.get(), false)) {
 			if (consumeFuel(player, stack, 2 * 64, false)) {
 				if (PlayerHelper.checkFeedCooldown(player)) {
 					level.playSound(null, player.getX(), player.getY(), player.getZ(), PESoundEvents.HEAL.get(), SoundSource.PLAYERS, 1, 1);
@@ -52,7 +50,7 @@ public class LifeStone extends PEToggleItem implements IPedestalItem, ICapabilit
 					removeEmc(stack, 64);
 				}
 			} else {
-				stack.set(PEDataComponentTypes.ACTIVE, false);
+				stack.set(PEDataComponentTypes.ACTIVE.get(), false);
 			}
 		}
 	}
@@ -93,7 +91,7 @@ public class LifeStone extends PEToggleItem implements IPedestalItem, ICapabilit
 	}
 
 	@Override
-	public void attachCapabilities(RegisterCapabilitiesEvent event) {
-		IntegrationHelper.registerCuriosCapability(event, this);
+	public void attachCapabilities() {
+		//Fabric port: Curios/Trinkets integration not ported
 	}
 }

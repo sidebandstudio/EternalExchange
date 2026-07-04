@@ -1,5 +1,6 @@
 package moze_intel.projecte.gameObjs.block_entities;
 
+import moze_intel.projecte.compat.items.wrapper.CombinedInvWrapper;
 import java.util.function.BiFunction;
 import moze_intel.projecte.api.block_entity.IRelay;
 import moze_intel.projecte.api.capabilities.PECapabilities;
@@ -23,17 +24,15 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.ICapabilityProvider;
 import moze_intel.projecte.compat.items.IItemHandler;
 import moze_intel.projecte.compat.items.IItemHandlerModifiable;
 import moze_intel.projecte.compat.items.ItemStackHandler;
-import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class RelayMK1BlockEntity extends EmcBlockEntity implements MenuProvider, IRelay {
+public class RelayMK1BlockEntity extends EmcBlockEntity implements MenuProvider, IRelay, IItemHandlerBlockEntity {
 
-	public static final ICapabilityProvider<RelayMK1BlockEntity, @Nullable Direction, IItemHandler> INVENTORY_PROVIDER = (relay, side) -> {
+	public static final BiFunction<RelayMK1BlockEntity, @Nullable Direction, IItemHandler> INVENTORY_PROVIDER = (relay, side) -> {
 		if (side == null) {
 			return relay.joined;
 		} else if (side.getAxis().isVertical()) {
@@ -109,6 +108,12 @@ public class RelayMK1BlockEntity extends EmcBlockEntity implements MenuProvider,
 
 	public IItemHandler getOutput() {
 		return output;
+	}
+
+	//Fabric port: allows our blocks to query the inventory NeoForge exposed via the item handler block capability
+	@Override
+	public IItemHandler getItemHandler(@Nullable Direction side) {
+		return INVENTORY_PROVIDER.apply(this, side);
 	}
 
 	@Override

@@ -50,32 +50,31 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.common.MutableDataComponentHolder;
-import net.neoforged.neoforge.items.ComponentItemHandler;
 import moze_intel.projecte.compat.items.IItemHandler;
 import moze_intel.projecte.compat.items.IItemHandlerModifiable;
+import moze_intel.projecte.compat.network.PEMenuHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class MercurialEye extends ItemMode<MercurialEyeMode> implements IExtraFunction, ICapabilityAware {
 
 	public MercurialEye(Properties props) {
-		super(props.component(PEDataComponentTypes.MERCURIAL_EYE_MODE, MercurialEyeMode.CREATION)
-						.component(PEDataComponentTypes.EYE_INVENTORY, ItemContainerContents.EMPTY),
+		super(props.component(PEDataComponentTypes.MERCURIAL_EYE_MODE.get(), MercurialEyeMode.CREATION)
+						.component(PEDataComponentTypes.EYE_INVENTORY.get(), ItemContainerContents.EMPTY),
 				4
 		);
 	}
 
 	@Override
 	public boolean doExtraFunction(@NotNull Player player, @NotNull ItemStack stack, InteractionHand hand) {
-		int selected = player.getInventory().selected;
-		MenuProvider provider = new SimpleMenuProvider((id, inv, pl) -> new MercurialEyeContainer(id, inv, hand, selected), stack.getHoverName());
-		player.openMenu(provider, b -> {
-			b.writeEnum(hand);
-			b.writeByte(selected);
-		});
+		if (player instanceof ServerPlayer serverPlayer) {
+			int selected = player.getInventory().selected;
+			MenuProvider provider = new SimpleMenuProvider((id, inv, pl) -> new MercurialEyeContainer(id, inv, hand, selected), stack.getHoverName());
+			PEMenuHelper.openMenu(serverPlayer, provider, b -> {
+				b.writeEnum(hand);
+				b.writeByte(selected);
+			});
+		}
 		return true;
 	}
 
@@ -107,7 +106,7 @@ public class MercurialEye extends ItemMode<MercurialEyeMode> implements IExtraFu
 	}
 
 	private InteractionResult formBlocks(ItemStack eye, Player player, InteractionHand hand, Level level, BlockPos startingPos, @Nullable Direction facing) {
-		IItemHandler inventory = eye.getCapability(ItemHandler.ITEM);
+		IItemHandler inventory = getEyeInventory(eye);
 		if (inventory == null) {
 			return InteractionResult.FAIL;
 		}
@@ -272,7 +271,7 @@ public class MercurialEye extends ItemMode<MercurialEyeMode> implements IExtraFu
 		if (oldState == newState || oldState.hasBlockEntity()) {
 			return false;
 		}
-		IItemHandler inventory = eye.getCapability(ItemHandler.ITEM);
+		IItemHandler inventory = getEyeInventory(eye);
 		if (inventory == null) {
 			return false;
 		}
@@ -343,8 +342,15 @@ public class MercurialEye extends ItemMode<MercurialEyeMode> implements IExtraFu
 	}
 
 	@Override
-	public void attachCapabilities(RegisterCapabilitiesEvent event) {
-		event.registerItem(ItemHandler.ITEM, (stack, context) -> new EyeItemHandler(stack), this);
+	public void attachCapabilities() {
+		//Fabric port: no item handler ItemApiLookup shim exists yet for cross-mod exposure; the eye's inventory is accessed via getEyeInventory
+	}
+
+	/**
+	 * Fabric port: upstream exposed this as a NeoForge item capability; the container and this item construct it directly instead.
+	 */
+	public static IItemHandlerModifiable getEyeInventory(ItemStack stack) {
+		return new EyeItemHandler(stack);
 	}
 
 	@Override
@@ -357,10 +363,106 @@ public class MercurialEye extends ItemMode<MercurialEyeMode> implements IExtraFu
 		return MercurialEyeMode.CREATION;
 	}
 
-	private static class EyeItemHandler extends ComponentItemHandler {
+	/**
+	 * Fabric port: reimplements NeoForge's ComponentItemHandler on top of the EYE_INVENTORY component using only vanilla APIs.
+	 */
+	private static class EyeItemHandler implements IItemHandlerModifiable {
 
-		public EyeItemHandler(MutableDataComponentHolder parent) {
-			super(parent, PEDataComponentTypes.EYE_INVENTORY.get(), 2);
+		private static final int SIZE = 2;
+
+		private final ItemStack parent;
+
+		public EyeItemHandler(ItemStack parent) {
+			this.parent = parent;
+		}
+
+		private ItemContainerContents getContents() {
+			return parent.getOrDefault(PEDataComponentTypes.EYE_INVENTORY.get(), ItemContainerContents.EMPTY);
+		}
+
+		private static NonNullList<ItemStack> copyContents(ItemContainerContents contents) {
+			NonNullList<ItemStack> list = NonNullList.withSize(SIZE, ItemStack.EMPTY);
+			contents.copyInto(list);
+			return list;
+		}
+
+		private void updateContents(ItemContainerContents contents, ItemStack stack, int slot) {
+			NonNullList<ItemStack> list = copyContents(contents);
+			//Note: We just do a copy with count of one as the empty stack will stay empty
+			list.set(slot, stack.copyWithCount(1));
+			parent.set(PEDataComponentTypes.EYE_INVENTORY.get(), ItemContainerContents.fromItems(list));
+		}
+
+		@Override
+		public int getSlots() {
+			return SIZE;
+		}
+
+		@NotNull
+		@Override
+		public ItemStack getStackInSlot(int slot) {
+			validateSlotIndex(slot);
+			return copyContents(getContents()).get(slot);
+		}
+
+		@Override
+		public void setStackInSlot(int slot, @NotNull ItemStack stack) {
+			validateSlotIndex(slot);
+			if (!isItemValid(slot, stack)) {
+				throw new RuntimeException("Invalid stack " + stack + " for slot " + slot + ")");
+			}
+			ItemContainerContents contents = getContents();
+			ItemStack existing = copyContents(contents).get(slot);
+			if (!ItemStack.matches(stack, existing)) {
+				updateContents(contents, stack, slot);
+			}
+		}
+
+		@NotNull
+		@Override
+		public ItemStack insertItem(int slot, @NotNull ItemStack toInsert, boolean simulate) {
+			validateSlotIndex(slot);
+			if (toInsert.isEmpty()) {
+				return ItemStack.EMPTY;
+			} else if (!isItemValid(slot, toInsert)) {
+				return toInsert;
+			}
+			ItemContainerContents contents = getContents();
+			ItemStack existing = copyContents(contents).get(slot);
+			int insertLimit = Math.min(getSlotLimit(slot), toInsert.getMaxStackSize());
+			if (!existing.isEmpty()) {
+				if (!ItemStack.isSameItemSameComponents(toInsert, existing)) {
+					return toInsert;
+				}
+				insertLimit -= existing.getCount();
+			}
+			if (insertLimit <= 0) {
+				return toInsert;
+			}
+			int inserted = Math.min(insertLimit, toInsert.getCount());
+			if (!simulate) {
+				updateContents(contents, toInsert.copyWithCount(existing.getCount() + inserted), slot);
+			}
+			return toInsert.copyWithCount(toInsert.getCount() - inserted);
+		}
+
+		@NotNull
+		@Override
+		public ItemStack extractItem(int slot, int amount, boolean simulate) {
+			validateSlotIndex(slot);
+			if (amount == 0) {
+				return ItemStack.EMPTY;
+			}
+			ItemContainerContents contents = getContents();
+			ItemStack existing = copyContents(contents).get(slot);
+			if (existing.isEmpty()) {
+				return ItemStack.EMPTY;
+			}
+			int toExtract = Math.min(amount, existing.getMaxStackSize());
+			if (!simulate) {
+				updateContents(contents, existing.copyWithCount(existing.getCount() - toExtract), slot);
+			}
+			return existing.copyWithCount(Math.min(existing.getCount(), toExtract));
 		}
 
 		@Override
@@ -378,10 +480,10 @@ public class MercurialEye extends ItemMode<MercurialEyeMode> implements IExtraFu
 			return 1;
 		}
 
-		@Override
-		protected void updateContents(@NotNull ItemContainerContents contents, @NotNull ItemStack stack, int slot) {
-			//Note: We just do a copy with count of one as the empty stack will stay empty
-			super.updateContents(contents, stack.copyWithCount(1), slot);
+		private static void validateSlotIndex(int slot) {
+			if (slot < 0 || slot >= SIZE) {
+				throw new IllegalArgumentException("Slot " + slot + " not in valid range - [0," + SIZE + ")");
+			}
 		}
 	}
 

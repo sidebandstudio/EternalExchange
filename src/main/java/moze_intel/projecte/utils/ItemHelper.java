@@ -99,7 +99,8 @@ public final class ItemHelper {
 	}
 
 	public static boolean isRepairableDamagedItem(ItemStack stack) {
-		return stack.isDamageableItem() && stack.isRepairable() && stack.getDamageValue() > 0;
+		//Fabric port: no isRepairable() extension (it only filters items flagged no-repair on NeoForge)
+		return stack.isDamageableItem() && stack.getDamageValue() > 0;
 	}
 
 	/**

@@ -15,7 +15,6 @@ import moze_intel.projecte.gameObjs.items.ICapabilityAware;
 import moze_intel.projecte.gameObjs.items.ItemPE;
 import moze_intel.projecte.gameObjs.registries.PEDataComponentTypes;
 import moze_intel.projecte.gameObjs.registries.PESoundEvents;
-import moze_intel.projecte.integration.IntegrationHelper;
 import moze_intel.projecte.utils.MathUtils;
 import moze_intel.projecte.utils.WorldHelper;
 import moze_intel.projecte.utils.text.PELang;
@@ -38,16 +37,15 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class SWRG extends ItemPE implements IPedestalItem, IProjectileShooter, ICapabilityAware {
 
 	public SWRG(Properties props) {
-		super(props.component(PEDataComponentTypes.SWRG_MODE, SWRGMode.OFF)
-				.component(PEDataComponentTypes.STORED_EMC, 0L)
-				.component(PEDataComponentTypes.UNPROCESSED_EMC, 0.0)
+		super(props.component(PEDataComponentTypes.SWRG_MODE.get(), SWRGMode.OFF)
+				.component(PEDataComponentTypes.STORED_EMC.get(), 0L)
+				.component(PEDataComponentTypes.UNPROCESSED_EMC.get(), 0.0)
 		);
 	}
 
@@ -91,7 +89,7 @@ public class SWRG extends ItemPE implements IPedestalItem, IProjectileShooter, I
 	}
 
 	private SWRGMode getMode(ItemStack stack) {
-		return stack.getOrDefault(PEDataComponentTypes.SWRG_MODE, SWRGMode.OFF);
+		return stack.getOrDefault(PEDataComponentTypes.SWRG_MODE.get(), SWRGMode.OFF);
 	}
 
 	@NotNull
@@ -109,7 +107,7 @@ public class SWRG extends ItemPE implements IPedestalItem, IProjectileShooter, I
 		if (mode == oldMode) {
 			return mode;
 		}
-		stack.set(PEDataComponentTypes.SWRG_MODE, mode);
+		stack.set(PEDataComponentTypes.SWRG_MODE.get(), mode);
 		if (player == null) {
 			//Don't do sounds if the player is null
 			return mode;
@@ -171,8 +169,8 @@ public class SWRG extends ItemPE implements IPedestalItem, IProjectileShooter, I
 	}
 
 	@Override
-	public void attachCapabilities(RegisterCapabilitiesEvent event) {
-		IntegrationHelper.registerCuriosCapability(event, this);
+	public void attachCapabilities() {
+		//Fabric port: Curios/Trinkets integration not ported
 	}
 
 	public enum SWRGMode implements StringRepresentable {//Change the mode of SWRG. Modes:<p> 0 = Ring Off<p> 1 = Flight<p> 2 = Shield<p> 3 = Flight + Shield<p>

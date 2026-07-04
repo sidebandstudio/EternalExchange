@@ -43,7 +43,7 @@ public class ComponentProcessorHelper implements IComponentProcessorHelper {
 			//Calculate and store the min emc value needed for specific dye colors for use in data component processors
 			colorEmc = new Object2LongOpenHashMap<>();
 			for (DyeColor color : Constants.COLORS) {
-				long minColorEmc = getMinValue(emcLookup, BuiltInRegistries.ITEM.getTagOrEmpty(color.getTag()), HOLDER_TO_INFO);
+				long minColorEmc = getMinValue(emcLookup, BuiltInRegistries.ITEM.getTagOrEmpty(getDyeTag(color)), HOLDER_TO_INFO);
 				if (minColorEmc > 0) {
 					colorEmc.put(color, minColorEmc);
 				}
@@ -74,21 +74,22 @@ public class ComponentProcessorHelper implements IComponentProcessorHelper {
 			return ingredient.getItems();
 		} catch (Exception e) {
 			//Note: In theory this should never throw as it is called after all the reload listeners have fired, but in case it does error: catch it
-			ICustomIngredient customIngredient = ingredient.getCustomIngredient();
+			//Fabric port: identify custom ingredients by their Fabric serializer id instead of NeoForge's ingredient type registry
+			CustomIngredient customIngredient = ingredient.getCustomIngredient();
 			if (customIngredient != null) {//Should basically always be the case
-				ResourceLocation name = NeoForgeRegistries.INGREDIENT_TYPES.getKey(customIngredient.getType());
-				if (name == null) {
-					PECore.LOGGER.error(LogUtils.FATAL_MARKER, "Ingredient of type: {} crashed when getting the matching stacks. Please report this to the ingredient's creator.",
-							customIngredient.getClass(), e);
-				} else {
-					PECore.LOGGER.error(LogUtils.FATAL_MARKER, "Ingredient of type: {} crashed when getting the matching stacks. Please report this to the ingredient's creator ({}).",
-							name, name.getNamespace(), e);
-				}
+				ResourceLocation name = customIngredient.getSerializer().getIdentifier();
+				PECore.LOGGER.error(LogUtils.FATAL_MARKER, "Ingredient of type: {} crashed when getting the matching stacks. Please report this to the ingredient's creator ({}).",
+						name, name.getNamespace(), e);
 			} else {
 				PECore.LOGGER.error(LogUtils.FATAL_MARKER, "Crashed when getting the matching stacks.", e);
 			}
 			return new ItemStack[0];
 		}
+	}
+
+	//Fabric port: vanilla DyeColor has no getTag (NeoForge patch); construct the matching c:dyes/<color> conventional tag
+	private static TagKey<Item> getDyeTag(DyeColor color) {
+		return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "dyes/" + color.getName()));
 	}
 
 	@Range(from = 0, to = Long.MAX_VALUE)

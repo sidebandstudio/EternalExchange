@@ -696,18 +696,18 @@ public final class WorldHelper {
 			}
 		} else {
 			BlockState state = level.getBlockState(pos);
-			if (moze_intel.projecte.compat.ItemAbilityHelper.getToolModifiedState(moze_intel.projecte.compat.ItemAbilityHelper, moze_intel.projecte.compat.ItemAbilityHelper, state, ctx, ItemAbilities.FIRESTARTER_LIGHT, true) != null) {
+			if (moze_intel.projecte.compat.ItemAbilityHelper.getToolModifiedState(state, ctx, ItemAbilities.FIRESTARTER_LIGHT, true) != null) {
 				if (!level.isClientSide && PlayerHelper.hasBreakPermission((ServerPlayer) player, level, pos)) {
-					BlockState modifiedState = moze_intel.projecte.compat.ItemAbilityHelper.getToolModifiedState(moze_intel.projecte.compat.ItemAbilityHelper, moze_intel.projecte.compat.ItemAbilityHelper, state, ctx, ItemAbilities.FIRESTARTER_LIGHT, false);
+					BlockState modifiedState = moze_intel.projecte.compat.ItemAbilityHelper.getToolModifiedState(state, ctx, ItemAbilities.FIRESTARTER_LIGHT, false);
 					if (modifiedState != null) {//Theoretically should not be null as we just simulated, but validate it just in case
 						level.setBlockAndUpdate(pos, modifiedState);
 						level.playSound(null, player.getX(), player.getY(), player.getZ(), PESoundEvents.POWER.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
 					}
 				}
-			} else if (state.isFlammable(level, pos, side)) {
+			} else if (moze_intel.projecte.compat.FireHelper.isFlammable(state, level, pos, side)) {
 				if (!level.isClientSide && PlayerHelper.hasBreakPermission((ServerPlayer) player, level, pos)) {
 					// Ignite the block
-					state.onCaughtFire(level, pos, side, player);
+					moze_intel.projecte.compat.FireHelper.onCaughtFire(state, level, pos, side, player);
 					if (state.getBlock() instanceof TntBlock) {
 						level.removeBlock(pos, false);
 					}

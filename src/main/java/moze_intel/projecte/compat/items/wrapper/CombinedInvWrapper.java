@@ -1,4 +1,4 @@
-package moze_intel.projecte.gameObjs.block_entities;
+package moze_intel.projecte.compat.items.wrapper;
 
 import moze_intel.projecte.compat.items.IItemHandlerModifiable;
 import net.minecraft.world.item.ItemStack;

@@ -9,6 +9,7 @@ import moze_intel.projecte.config.PEConfigTranslations;
 import moze_intel.projecte.utils.Constants;
 import moze_intel.projecte.utils.EMCHelper;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.ShulkerBoxColoring;
@@ -28,7 +29,8 @@ public class ShulkerRecoloringMapper extends SpecialRecipeMapper<ShulkerBoxColor
 		for (DyeColor color : Constants.COLORS) {
 			mapper.addConversion(1, NSSItem.createItem(ShulkerBoxBlock.getBlockByColor(color)), EMCHelper.intMapOf(
 					nssShulker, 1,
-					NSSItem.createTag(color.getTag()), 1
+					//Fabric port: vanilla DyeColor has no getTag (NeoForge patch); construct the matching c:dyes/<color> conventional tag
+					NSSItem.createTag(ResourceLocation.fromNamespaceAndPath("c", "dyes/" + color.getName())), 1
 			));
 		}
 		return true;

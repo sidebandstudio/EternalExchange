@@ -72,7 +72,8 @@ public class PEDeferredHolder<R, T extends R> implements Holder<R>, Supplier<T>,
 
 	@Override
 	@NotNull
-	public R value() {
+	public T value() {
+		//Covariant override, matching NeoForge's DeferredHolder
 		return get();
 	}
 

@@ -14,8 +14,9 @@ import net.minecraft.world.item.MapItem;
 import net.minecraft.world.item.component.MapPostProcessing;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
-import net.neoforged.fml.loading.FMLEnvironment;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
+import moze_intel.projecte.compat.fml.ServerLifecycleHooks;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
@@ -101,7 +102,7 @@ public class MapScaleProcessor implements IDataComponentProcessor {
 			//Note: This is not ideal, but because ServerLevel#getMapData, sends the map id via the overworld's data storage
 			// that means the level doesn't really matter on the server side as it will all be from the overworld anyway
 			return server.overworld();
-		} else if (FMLEnvironment.dist.isClient()) {
+		} else if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
 			return ClientLevelHelper.getLevel();
 		}
 		return null;

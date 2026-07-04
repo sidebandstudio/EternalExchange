@@ -15,8 +15,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.living.LivingEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class GemLegs extends GemArmorBase {
@@ -25,7 +23,7 @@ public class GemLegs extends GemArmorBase {
 
 	public GemLegs(Properties props) {
 		super(ArmorItem.Type.LEGGINGS, props);
-		NeoForge.EVENT_BUS.addListener(this::onJump);
+		//Fabric port: upstream registered onJump on the NeoForge event bus (LivingJumpEvent) here
 	}
 
 	@Override
@@ -36,8 +34,9 @@ public class GemLegs extends GemArmorBase {
 
 	private final Int2LongMap lastJumpTracker = new Int2LongOpenHashMap();
 
-	private void onJump(LivingEvent.LivingJumpEvent evt) {
-		if (evt.getEntity() instanceof Player player && player.level().isClientSide) {
+	//Fabric port: upstream subscribed this to NeoForge's LivingJumpEvent; needs a client side jump hook (e.g. a LivingEntity#jumpFromGround mixin) to call it
+	public void onJump(LivingEntity entity) {
+		if (entity instanceof Player player && player.level().isClientSide) {
 			lastJumpTracker.put(player.getId(), player.level().getGameTime());
 		}
 	}

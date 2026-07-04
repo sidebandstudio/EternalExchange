@@ -10,6 +10,8 @@ import net.fabricmc.fabric.api.lookup.v1.entity.EntityApiLookup;
  */
 public final class IntegrationHelper {
 
+	public static final String CURIO_MODID = "curios";
+
 	public static final EntityApiLookup<IItemHandler, Void> CURIO_ITEM_HANDLER =
 			EntityApiLookup.get(PECore.rl("curio_item_handler"), IItemHandler.class, Void.class);
 

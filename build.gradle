@@ -58,6 +58,10 @@ dependencies {
 	include "com.electronwill.night-config:core:${project.night_config_version}"
 	include "com.electronwill.night-config:toml:${project.night_config_version}"
 
+	// EMC math (BigFraction); provided by NeoForge upstream, bundled here
+	implementation "org.apache.commons:commons-math3:3.6.1"
+	include "org.apache.commons:commons-math3:3.6.1"
+
 	testImplementation "org.junit.jupiter:junit-jupiter:${project.junit_version}"
 	testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }

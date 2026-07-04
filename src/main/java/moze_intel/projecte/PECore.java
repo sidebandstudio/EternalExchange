@@ -253,8 +253,8 @@ public class PECore implements ModInitializer {
 					if (modifiedState != null) {
 						level.setBlockAndUpdate(pos, modifiedState);
 						level.gameEvent(null, GameEvent.BLOCK_CHANGE, pos);
-					} else if (state.isFlammable(level, pos, opposite)) {
-						state.onCaughtFire(level, pos, opposite, null);
+					} else if (moze_intel.projecte.compat.FireHelper.isFlammable(state, level, pos, opposite)) {
+						moze_intel.projecte.compat.FireHelper.onCaughtFire(state, level, pos, opposite, null);
 						if (state.getBlock() instanceof TntBlock) {
 							level.removeBlock(pos, false);
 						}

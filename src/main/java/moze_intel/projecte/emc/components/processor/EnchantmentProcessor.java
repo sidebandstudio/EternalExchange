@@ -55,8 +55,10 @@ public class EnchantmentProcessor extends PersistentComponentProcessor<ItemEncha
 
 	@Override
 	public void addConfigOptions(ModConfigSpec.Builder configBuilder) {
-		enchantmentEmcBonus = PEConfigTranslations.DCP_ENCHANTMENT_EMC_BONUS.applyToBuilder(configBuilder).worldRestart()
+		//Fabric port: the config shim's ConfigValue is not a LongSupplier like NeoForge's LongValue, so adapt it via a method reference
+		ModConfigSpec.ConfigValue<Long> emcBonus = PEConfigTranslations.DCP_ENCHANTMENT_EMC_BONUS.applyToBuilder(configBuilder).worldRestart()
 				.defineInRange("enchantment_emc_bonus", DEFAULT_ENCHANT_EMC_BONUS, 0, Long.MAX_VALUE);
+		enchantmentEmcBonus = emcBonus::get;
 	}
 
 	@Override

@@ -1,12 +1,14 @@
 package moze_intel.projecte.gameObjs.blocks;
 
 import com.mojang.serialization.MapCodec;
+import moze_intel.projecte.compat.network.PEMenuHelper;
 import moze_intel.projecte.gameObjs.container.TransmutationContainer;
 import moze_intel.projecte.gameObjs.registries.PEBlockTypes;
 import moze_intel.projecte.utils.text.PELang;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -50,7 +52,8 @@ public class TransmutationStone extends DirectionalBlock implements SimpleWaterl
 	@NotNull
 	@Override
 	protected MapCodec<? extends DirectionalBlock> codec() {
-		return PEBlockTypes.TRANSMUTATION_TABLE.value();
+		//Fabric port: get() keeps the specialized codec type (PEDeferredHolder#value() returns the registry base type)
+		return PEBlockTypes.TRANSMUTATION_TABLE.get();
 	}
 
 	@Override
@@ -84,8 +87,9 @@ public class TransmutationStone extends DirectionalBlock implements SimpleWaterl
 	@Override
 	@Deprecated
 	protected InteractionResult useWithoutItem(@NotNull BlockState state, Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull BlockHitResult rtr) {
-		if (!level.isClientSide) {
-			player.openMenu(new ContainerProvider(), b -> b.writeBoolean(false));
+		if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
+			//Fabric port: replaces NeoForge's openMenu(provider, bufWriter)
+			PEMenuHelper.openMenu(serverPlayer, new ContainerProvider(), b -> b.writeBoolean(false));
 		}
 		return InteractionResult.sidedSuccess(level.isClientSide);
 	}

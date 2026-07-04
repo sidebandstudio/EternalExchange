@@ -236,7 +236,7 @@ public class ToolHelper {
 			//Skip modifying the blocks if there is something we think is invalid about the position in the world in general
 			return InteractionResult.PASS;
 		}
-		BlockState modifiedState = moze_intel.projecte.compat.ItemAbilityHelper.getToolModifiedState(moze_intel.projecte.compat.ItemAbilityHelper, moze_intel.projecte.compat.ItemAbilityHelper, clickedState, context, action, false);
+		BlockState modifiedState = moze_intel.projecte.compat.ItemAbilityHelper.getToolModifiedState(clickedState, context, action, false);
 		if (modifiedState == null) {
 			//Skip modifying the blocks if the one we clicked cannot be modified
 			return InteractionResult.PASS;
@@ -268,14 +268,14 @@ public class ToolHelper {
 				UseOnContext adjustedContext = new UseOnContext(level, context.getPlayer(), context.getHand(), context.getItemInHand(), new BlockHitResult(
 						context.getClickLocation().add(newPos.getX() - pos.getX(), newPos.getY() - pos.getY(), newPos.getZ() - pos.getZ()),
 						context.getClickedFace(), newPos, context.isInside()));
-				if (toolAOEData.isValid(level, newPos, state) && modifiedState == moze_intel.projecte.compat.ItemAbilityHelper.getToolModifiedState(moze_intel.projecte.compat.ItemAbilityHelper, moze_intel.projecte.compat.ItemAbilityHelper, state, adjustedContext, action, true)) {
+				if (toolAOEData.isValid(level, newPos, state) && modifiedState == moze_intel.projecte.compat.ItemAbilityHelper.getToolModifiedState(state, adjustedContext, action, true)) {
 					if (ItemPE.consumeFuel(player, stack, emcCost, true)) {
 						//Some of the below methods don't behave properly when the BlockPos is mutable, so now that we are onto ones where it may actually
 						// matter we make sure to get an immutable instance of newPos
 						newPos = newPos.immutable();
 						CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger((ServerPlayer) player, newPos, context.getItemInHand());
 						//Run it without simulation in case there are any side effects
-						moze_intel.projecte.compat.ItemAbilityHelper.getToolModifiedState(moze_intel.projecte.compat.ItemAbilityHelper, moze_intel.projecte.compat.ItemAbilityHelper, state, adjustedContext, action, false);
+						moze_intel.projecte.compat.ItemAbilityHelper.getToolModifiedState(state, adjustedContext, action, false);
 						//Replace the block. Note it just directly sets it (in the same way the normal tools do), rather than using our
 						// checkedReplaceBlock to make the blocks not "blink" when getting changed. We don't bother using checkedReplaceBlock
 						// as we already fired all the events/checks for seeing if we are allowed to use this item in this location and were

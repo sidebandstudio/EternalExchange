@@ -41,7 +41,8 @@ public class MercurialEyeProcessor extends SimpleContainerProcessor<ItemContaine
 
 	@Override
 	protected ItemContainerContents cleanPersistentComponent(@NotNull ItemContainerContents component) {
-		if (component.getSlots() == 1) {
+		//Fabric port: vanilla ItemContainerContents has no getSlots (NeoForge patch); the stream contains one entry per stored slot
+		if (component.stream().count() == 1) {
 			return component;
 		}
 		return ItemContainerContents.fromItems(List.of(component.copyOne()));

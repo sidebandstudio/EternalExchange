@@ -43,8 +43,8 @@ import org.jetbrains.annotations.NotNull;
 public class HarvestGoddess extends PEToggleItem implements IPedestalItem {
 
 	public HarvestGoddess(Properties props) {
-		super(props.component(PEDataComponentTypes.STORED_EMC, 0L)
-				.component(PEDataComponentTypes.UNPROCESSED_EMC, 0.0)
+		super(props.component(PEDataComponentTypes.STORED_EMC.get(), 0L)
+				.component(PEDataComponentTypes.UNPROCESSED_EMC.get(), 0.0)
 		);
 	}
 
@@ -54,9 +54,9 @@ public class HarvestGoddess extends PEToggleItem implements IPedestalItem {
 		if (level.isClientSide || !hotBarOrOffHand(slot) || !(entity instanceof Player player)) {
 			return;
 		}
-		if (stack.getOrDefault(PEDataComponentTypes.ACTIVE, false)) {
+		if (stack.getOrDefault(PEDataComponentTypes.ACTIVE.get(), false)) {
 			if (!hasEmc(player, stack, 64, true)) {
-				stack.set(PEDataComponentTypes.ACTIVE, false);
+				stack.set(PEDataComponentTypes.ACTIVE.get(), false);
 			} else {
 				WorldHelper.growNearbyRandomly(true, level, player);
 				removeEmc(stack, 0.32F);

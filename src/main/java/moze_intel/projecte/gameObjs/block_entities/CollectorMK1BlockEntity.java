@@ -1,5 +1,7 @@
 package moze_intel.projecte.gameObjs.block_entities;
 
+import moze_intel.projecte.compat.items.wrapper.RangedWrapper;
+import moze_intel.projecte.compat.items.wrapper.CombinedInvWrapper;
 import java.util.function.BiFunction;
 import moze_intel.projecte.api.block_entity.IRelay;
 import moze_intel.projecte.api.capabilities.PECapabilities;

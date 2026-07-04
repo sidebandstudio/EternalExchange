@@ -64,8 +64,10 @@ public class CraftingMapper implements IEMCMapper<NormalizedSimpleStack, Long> {
 			configBuilder.comment(recipeMapper.getDescription())
 					.translation(recipeMapper.getTranslationKey())
 					.push(recipeMapper.getConfigPath());
-			enabledRecipeMappers.put(recipeMapper.getName(), PEConfigTranslations.MAPPING_RECIPE_TYPE_MAPPER_ENABLED.applyToBuilder(configBuilder)
-					.define("enabled", recipeMapper.isAvailable()));
+			//Fabric port: the config shim's ConfigValue is not a BooleanSupplier like NeoForge's BooleanValue, so adapt it via a method reference
+			ModConfigSpec.ConfigValue<Boolean> enabled = PEConfigTranslations.MAPPING_RECIPE_TYPE_MAPPER_ENABLED.applyToBuilder(configBuilder)
+					.define("enabled", recipeMapper.isAvailable());
+			enabledRecipeMappers.put(recipeMapper.getName(), enabled::get);
 			recipeMapper.addConfigOptions(configBuilder);
 			configBuilder.pop();
 		}

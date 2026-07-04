@@ -4,12 +4,16 @@ import com.google.common.base.Suppliers;
 import java.util.List;
 import java.util.function.Supplier;
 import moze_intel.projecte.PECore;
+import moze_intel.projecte.compat.events.ItemAttributeModifierEvent;
 import moze_intel.projecte.gameObjs.registries.PEDataComponentTypes;
 import moze_intel.projecte.utils.ClientKeyHelper;
 import moze_intel.projecte.utils.PEKeybind;
 import moze_intel.projecte.utils.text.PELang;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlotGroup;
@@ -24,7 +28,6 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.fml.loading.FMLEnvironment;
 import org.jetbrains.annotations.NotNull;
 
 public class GemFeet extends GemArmorBase {
@@ -36,7 +39,7 @@ public class GemFeet extends GemArmorBase {
 	private final Supplier<ItemAttributeModifiers> defaultWithStepAssistModifiers;
 
 	public GemFeet(Properties props) {
-		super(ArmorItem.Type.BOOTS, props.component(PEDataComponentTypes.STEP_ASSIST, STEP_ASSIST_DEFAULT));
+		super(ArmorItem.Type.BOOTS, props.component(PEDataComponentTypes.STEP_ASSIST.get(), STEP_ASSIST_DEFAULT));
 		this.defaultModifiers = Suppliers.memoize(() -> super.getDefaultAttributeModifiers().withModifierAdded(
 				Attributes.MOVEMENT_SPEED,
 				new AttributeModifier(PECore.rl("armor"), 1.0, Operation.ADD_MULTIPLIED_TOTAL),
@@ -55,20 +58,32 @@ public class GemFeet extends GemArmorBase {
 		return this.defaultModifiers.get();
 	}
 
-	@NotNull
-	@Override
-	public ItemAttributeModifiers getDefaultAttributeModifiers(@NotNull ItemStack stack) {
-		return isStepAssist(stack) ? this.defaultWithStepAssistModifiers.get() : super.getDefaultAttributeModifiers(stack);
+	/**
+	 * Fabric port: upstream overrode NeoForge's stack aware getDefaultAttributeModifiers; on Fabric the conditional step assist modifiers are written to the stack's
+	 * ATTRIBUTE_MODIFIERS component when the toggle changes (and re-synced from inventoryTick for stacks that predate the component).
+	 */
+	private void applyStepAssistModifiers(ItemStack stack) {
+		ItemAttributeModifierEvent event = new ItemAttributeModifierEvent(stack);
+		if (isStepAssist(stack)) {
+			for (ItemAttributeModifiers.Entry entry : this.defaultWithStepAssistModifiers.get().modifiers()) {
+				event.addModifier(entry.attribute(), entry.modifier(), entry.slot());
+			}
+		}
+		event.apply();
 	}
 
 	public static void toggleStepAssist(ItemStack boots, Player player) {
 		boolean oldValue = isStepAssist(boots);
-		boots.set(PEDataComponentTypes.STEP_ASSIST, !oldValue);
+		boots.set(PEDataComponentTypes.STEP_ASSIST.get(), !oldValue);
+		if (boots.getItem() instanceof GemFeet gemFeet) {
+			//Fabric port: update the stack's attribute modifiers now that the state changed
+			gemFeet.applyStepAssistModifiers(boots);
+		}
 		player.sendSystemMessage(getComponent(!oldValue));
 	}
 
 	private static boolean isJumpPressed(Player player) {
-		if (FMLEnvironment.dist.isClient() && player instanceof LocalPlayer clientPlayer) {
+		if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT && player instanceof LocalPlayer clientPlayer) {
 			return clientPlayer.input.jumping;
 		}
 		return false;
@@ -77,6 +92,10 @@ public class GemFeet extends GemArmorBase {
 	@Override
 	public void inventoryTick(@NotNull ItemStack stack, @NotNull Level level, @NotNull Entity entity, int slot, boolean isHeld) {
 		super.inventoryTick(stack, level, entity, slot, isHeld);
+		if (!level.isClientSide && stack.has(DataComponents.ATTRIBUTE_MODIFIERS) != isStepAssist(stack)) {
+			//Fabric port: no per stack attribute event on Fabric, so keep the step assist modifiers on the stack in sync with the toggle
+			applyStepAssistModifiers(stack);
+		}
 		if (isArmorSlot(slot) && entity instanceof Player player) {
 			if (!level.isClientSide) {
 				player.resetFallDistance();
@@ -113,7 +132,7 @@ public class GemFeet extends GemArmorBase {
 	}
 
 	private static boolean isStepAssist(ItemStack stack) {
-		return stack.getOrDefault(PEDataComponentTypes.STEP_ASSIST, STEP_ASSIST_DEFAULT);
+		return stack.getOrDefault(PEDataComponentTypes.STEP_ASSIST.get(), STEP_ASSIST_DEFAULT);
 	}
 
 	private static Component getComponent(boolean enabled) {

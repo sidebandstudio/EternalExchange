@@ -2,7 +2,6 @@ package moze_intel.projecte.gameObjs.container.slots;
 
 import net.minecraft.world.item.ItemStack;
 import moze_intel.projecte.compat.items.IItemHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 public class InventoryContainerSlot extends SlotItemHandler implements IInventoryContainerSlot {
 

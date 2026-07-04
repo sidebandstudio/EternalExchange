@@ -1,5 +1,6 @@
 package moze_intel.projecte.gameObjs.block_entities;
 
+import java.util.function.BiFunction;
 import moze_intel.projecte.api.block_entity.IDMPedestal;
 import moze_intel.projecte.api.capabilities.PECapabilities;
 import moze_intel.projecte.api.capabilities.item.IPedestalItem;
@@ -18,7 +19,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.capabilities.ICapabilityProvider;
 import moze_intel.projecte.compat.items.IItemHandler;
 import moze_intel.projecte.compat.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class DMPedestalBlockEntity extends EmcBlockEntity implements IDMPedestal {
 
-	public static final ICapabilityProvider<DMPedestalBlockEntity, @Nullable Direction, IItemHandler> INVENTORY_PROVIDER = (pedestal, side) -> pedestal.inventory;
+	public static final BiFunction<DMPedestalBlockEntity, @Nullable Direction, IItemHandler> INVENTORY_PROVIDER = (pedestal, side) -> pedestal.inventory;
 	private static final int RANGE = 4;
 
 	private final StackHandler inventory = new StackHandler(1) {

@@ -8,7 +8,6 @@ import moze_intel.projecte.api.capabilities.item.IProjectileShooter;
 import moze_intel.projecte.config.ProjectEConfig;
 import moze_intel.projecte.gameObjs.entity.EntityWaterProjectile;
 import moze_intel.projecte.gameObjs.registries.PESoundEvents;
-import moze_intel.projecte.integration.IntegrationHelper;
 import moze_intel.projecte.utils.ClientKeyHelper;
 import moze_intel.projecte.utils.MathUtils;
 import moze_intel.projecte.utils.PEKeybind;
@@ -21,7 +20,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -33,12 +31,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.ServerLevelData;
-import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import moze_intel.projecte.compat.fluids.FluidStack;
-import moze_intel.projecte.compat.fluids.FluidType;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
 import org.jetbrains.annotations.NotNull;
 
 public class EvertideAmulet extends ItemPE implements IProjectileShooter, IPedestalItem, ICapabilityAware {
@@ -47,14 +39,10 @@ public class EvertideAmulet extends ItemPE implements IProjectileShooter, IPedes
 		super(props);
 	}
 
-	@Override
-	public boolean hasCraftingRemainingItem(@NotNull ItemStack stack) {
-		return true;
-	}
-
 	@NotNull
 	@Override
-	public ItemStack getCraftingRemainingItem(ItemStack stack) {
+	public ItemStack getRecipeRemainder(@NotNull ItemStack stack) {
+		//Fabric port: replaces NeoForge's stack aware getCraftingRemainingItem
 		return stack.copy();
 	}
 
@@ -69,11 +57,7 @@ public class EvertideAmulet extends ItemPE implements IProjectileShooter, IPedes
 		BlockPos pos = ctx.getClickedPos();
 		if (!level.isClientSide && PlayerHelper.hasEditPermission(player, level, pos)) {
 			Direction sideHit = ctx.getClickedFace();
-			IFluidHandler fluidHandler = WorldHelper.getCapability(level, FluidHandler.BLOCK, pos, sideHit);
-			if (fluidHandler != null) {
-				fluidHandler.fill(new FluidStack(Fluids.WATER, FluidType.BUCKET_VOLUME), IFluidHandler.FluidAction.EXECUTE);
-				return InteractionResult.CONSUME;
-			}
+			//Fabric port: filling a clicked fluid handler block (tank) is not ported (needs Fabric transfer API integration); always place in world
 			WorldHelper.placeFluid(player, level, pos, sideHit, Fluids.WATER, !ProjectEConfig.server.items.opEvertide.get());
 			level.playSound(null, player.getX(), player.getY(), player.getZ(), PESoundEvents.WATER_MAGIC.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
 		}
@@ -133,59 +117,8 @@ public class EvertideAmulet extends ItemPE implements IProjectileShooter, IPedes
 	}
 
 	@Override
-	public void attachCapabilities(RegisterCapabilitiesEvent event) {
-		event.registerItem(FluidHandler.ITEM, (stack, context) -> new InfiniteFluidHandler(stack), this);
-		IntegrationHelper.registerCuriosCapability(event, this);
-	}
-
-	private record InfiniteFluidHandler(ItemStack stack) implements IFluidHandlerItem {
-
-		@NotNull
-		@Override
-		public ItemStack getContainer() {
-			return stack;
-		}
-
-		@Override
-		public int getTanks() {
-			return 1;
-		}
-
-		@NotNull
-		@Override
-		public FluidStack getFluidInTank(int tank) {
-			return tank == 0 ? new FluidStack(Fluids.WATER, Integer.MAX_VALUE) : FluidStack.EMPTY;
-		}
-
-		@Override
-		public int getTankCapacity(int tank) {
-			return tank == 0 ? Integer.MAX_VALUE : 0;
-		}
-
-		@Override
-		public boolean isFluidValid(int tank, @NotNull FluidStack stack) {
-			return isWater(stack);
-		}
-
-		@Override
-		public int fill(@NotNull FluidStack resource, @NotNull FluidAction action) {
-			return isWater(resource) ? resource.getAmount() : 0;
-		}
-
-		@NotNull
-		@Override
-		public FluidStack drain(@NotNull FluidStack resource, @NotNull FluidAction action) {
-			return isWater(resource) ? resource : FluidStack.EMPTY;
-		}
-
-		private boolean isWater(FluidStack stack) {
-			return stack.is(FluidTags.WATER);
-		}
-
-		@NotNull
-		@Override
-		public FluidStack drain(int maxDrain, @NotNull FluidAction action) {
-			return new FluidStack(Fluids.WATER, maxDrain);
-		}
+	public void attachCapabilities() {
+		//Fabric port: fluid handler exposure for pipes/tanks not ported (needs Fabric transfer API integration)
+		//Fabric port: Curios/Trinkets integration not ported
 	}
 }

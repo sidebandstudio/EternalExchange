@@ -4,7 +4,6 @@ import java.util.function.Predicate;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import moze_intel.projecte.compat.items.IItemHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 import org.jetbrains.annotations.NotNull;
 
 public class SlotGhost extends SlotItemHandler implements ISlotGhost {

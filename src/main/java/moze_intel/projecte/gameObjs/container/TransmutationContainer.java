@@ -23,8 +23,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
 import moze_intel.projecte.compat.items.ItemHandlerHelper;
+import moze_intel.projecte.compat.items.wrapper.PlayerInvWrapper;
 import moze_intel.projecte.compat.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
@@ -137,7 +137,8 @@ public class TransmutationContainer extends PEHandContainer {
 						transmutationInventory.removeEmc(BigInteger.valueOf(itemEmc));
 					}
 					stack.setCount(1);
-					ItemHandlerHelper.insertItemStacked(player.getCapability(ItemHandler.ENTITY), stack, false);
+					//Fabric port: equivalent of querying ItemHandler.ENTITY on the player
+					ItemHandlerHelper.insertItemStacked(new PlayerInvWrapper(player.getInventory()), stack, false);
 				} else if (itemsRoomFor > 1) {
 					BigInteger availableEMC = transmutationInventory.getAvailableEmc();
 					BigInteger emc = BigInteger.valueOf(itemEmc);
@@ -158,7 +159,8 @@ public class TransmutationContainer extends PEHandContainer {
 					}
 					//Set the stack size to what we found the max value is we have room for (capped at the stack's own max size)
 					stack.setCount(itemsRoomFor);
-					ItemHandlerHelper.insertItemStacked(player.getCapability(ItemHandler.ENTITY), stack, false);
+					//Fabric port: equivalent of querying ItemHandler.ENTITY on the player
+					ItemHandlerHelper.insertItemStacked(new PlayerInvWrapper(player.getInventory()), stack, false);
 				}
 			}
 		} else if (slotIndex > 26) {

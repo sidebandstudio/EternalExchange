@@ -1,5 +1,6 @@
 package moze_intel.projecte.gameObjs.container.inventory;
 
+import moze_intel.projecte.compat.items.wrapper.CombinedInvWrapper;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import java.math.BigInteger;
@@ -25,10 +26,8 @@ import moze_intel.projecte.utils.text.SearchQueryParser.ISearchQuery;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.common.NeoForge;
 import moze_intel.projecte.compat.items.IItemHandlerModifiable;
 import moze_intel.projecte.compat.items.ItemStackHandler;
-import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
 
 public class TransmutationInventory extends CombinedInvWrapper {
 
@@ -51,10 +50,10 @@ public class TransmutationInventory extends CombinedInvWrapper {
 	private long lastAvailableEmc;
 
 	public TransmutationInventory(Player player) {
-		super((IItemHandlerModifiable) PECapabilities.KNOWLEDGE_CAPABILITY.find(Objects.requireNonNull(player, null)).getInputAndLocks(),
+		super((IItemHandlerModifiable) Objects.requireNonNull(PECapabilities.KNOWLEDGE_CAPABILITY.find(player, null)).getInputAndLocks(),
 				new ItemStackHandler(2), new ItemStackHandler(16));
 		this.player = player;
-		this.provider = PECapabilities.KNOWLEDGE_CAPABILITY.find(Objects.requireNonNull(player, null));
+		this.provider = Objects.requireNonNull(PECapabilities.KNOWLEDGE_CAPABILITY.find(player, null));
 		this.inputLocks = itemHandler[0];
 		this.learning = itemHandler[1];
 		this.outputs = itemHandler[2];
@@ -88,8 +87,11 @@ public class TransmutationInventory extends CombinedInvWrapper {
 	public void handleKnowledge(ItemInfo info) {
 		ItemInfo cleanedInfo = IEMCProxy.INSTANCE.getPersistentInfo(info);
 		//Pass both stacks to the Attempt Learn Event in case a mod cares about the data component/damage difference when comparing
-		if (!provider.hasKnowledge(cleanedInfo) && !NeoForge.EVENT_BUS.post(new PlayerAttemptLearnEvent(player, info, cleanedInfo)).isCanceled()) {
-			if (provider.addKnowledge(cleanedInfo)) {
+		if (!provider.hasKnowledge(cleanedInfo)) {
+			//Fabric port: fire the attempt learn event on its Fabric event instead of the NeoForge event bus
+			PlayerAttemptLearnEvent event = new PlayerAttemptLearnEvent(player, info, cleanedInfo);
+			PlayerAttemptLearnEvent.EVENT.invoker().onAttemptLearn(event);
+			if (!event.isCanceled() && provider.addKnowledge(cleanedInfo)) {
 				//Only sync the knowledge changed if the provider successfully added it
 				provider.syncKnowledgeChange((ServerPlayer) player, cleanedInfo, true);
 			}

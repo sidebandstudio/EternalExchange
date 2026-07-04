@@ -51,6 +51,26 @@ public final class ItemHandlerHelper {
 	}
 
 	/**
+	 * Comparator signal strength for an inventory, mirroring NeoForge's helper.
+	 */
+	public static int calcRedstoneFromInventory(@org.jetbrains.annotations.Nullable IItemHandler inv) {
+		if (inv == null) {
+			return 0;
+		}
+		int itemsFound = 0;
+		float proportion = 0.0F;
+		for (int j = 0; j < inv.getSlots(); j++) {
+			ItemStack stack = inv.getStackInSlot(j);
+			if (!stack.isEmpty()) {
+				proportion += (float) stack.getCount() / Math.min(inv.getSlotLimit(j), stack.getMaxStackSize());
+				itemsFound++;
+			}
+		}
+		proportion = proportion / inv.getSlots();
+		return net.minecraft.util.Mth.floor(proportion * 14.0F) + (itemsFound > 0 ? 1 : 0);
+	}
+
+	/**
 	 * Gives the stack to the player, dropping any remainder at their position.
 	 */
 	public static void giveItemToPlayer(Player player, @NotNull ItemStack stack) {

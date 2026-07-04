@@ -1,12 +1,15 @@
 package moze_intel.projecte.gameObjs.blocks;
 
+import moze_intel.projecte.compat.network.PEMenuHelper;
 import moze_intel.projecte.gameObjs.block_entities.EmcChestBlockEntity;
+import moze_intel.projecte.gameObjs.block_entities.IItemHandlerBlockEntity;
 import moze_intel.projecte.gameObjs.registration.impl.BlockEntityTypeRegistryObject;
 import moze_intel.projecte.gameObjs.registries.PEBlockEntityTypes;
 import moze_intel.projecte.utils.WorldHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
@@ -28,8 +31,6 @@ import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
-import moze_intel.projecte.compat.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -77,7 +78,10 @@ public class AlchemicalChest extends BlockDirection implements SimpleWaterlogged
 		}
 		EmcChestBlockEntity chest = WorldHelper.getBlockEntity(EmcChestBlockEntity.class, level, pos, true);
 		if (chest != null) {
-			player.openMenu(chest, pos);
+			//Fabric port: replaces NeoForge's openMenu(provider, pos); the client container factory reads the position back
+			if (player instanceof ServerPlayer serverPlayer) {
+				PEMenuHelper.openMenu(serverPlayer, chest, buf -> buf.writeBlockPos(pos));
+			}
 			player.awardStat(Stats.OPEN_CHEST);
 			PiglinAi.angerNearbyPiglins(player, true);
 		}
@@ -115,7 +119,9 @@ public class AlchemicalChest extends BlockDirection implements SimpleWaterlogged
 	@Override
 	@Deprecated
 	public int getAnalogOutputSignal(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos) {
-		return ItemHandlerHelper.calcRedstoneFromInventory(WorldHelper.getCapability(level, ItemHandler.BLOCK, pos, state, null, null));
+		//Fabric port: no block item handler capability lookup; read the inventory our own block entity exposes
+		return IItemHandlerBlockEntity.calcRedstoneFromInventory(
+				WorldHelper.getBlockEntity(level, pos) instanceof IItemHandlerBlockEntity handlerBE ? handlerBE.getItemHandler(null) : null);
 	}
 
 	@NotNull

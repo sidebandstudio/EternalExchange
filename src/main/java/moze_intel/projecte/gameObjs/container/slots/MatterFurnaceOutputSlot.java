@@ -4,7 +4,6 @@ import moze_intel.projecte.gameObjs.block_entities.DMFurnaceBlockEntity;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.event.EventHooks;
 import moze_intel.projecte.compat.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -55,6 +54,6 @@ public class MatterFurnaceOutputSlot extends InventoryContainerSlot {
 		}
 
 		removeCount = 0;
-		EventHooks.firePlayerSmeltedEvent(player, stack);
+		//Fabric port: Fabric has no equivalent of NeoForge's PlayerEvent.ItemSmeltedEvent, so it is not fired
 	}
 }

@@ -40,7 +40,7 @@ public final class ItemAbilityHelper {
 			return false;
 		}
 		if (stack.getItem() instanceof AbilityAware aware) {
-			return moze_intel.projecte.compat.ItemAbilityHelper.canPerformAction(moze_intel.projecte.compat.ItemAbilityHelper, aware, stack, ability);
+			return aware.canPerformAction(stack, ability);
 		}
 		//Vanilla defaults, mirroring NeoForge's IItemExtension defaults for the abilities ProjectE checks
 		if (stack.getItem() instanceof AxeItem) {

@@ -8,24 +8,24 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import org.jetbrains.annotations.NotNull;
 
-public class DoublePEDeferredRegister<PRIMARY, SECONDARY> {
+public class DoubleDeferredRegister<PRIMARY, SECONDARY> {
 
 	@NotNull
 	protected final PEDeferredRegister<PRIMARY> primaryRegister;
 	@NotNull
 	protected final PEDeferredRegister<SECONDARY> secondaryRegister;
 
-	public DoublePEDeferredRegister(@NotNull PEDeferredRegister<PRIMARY> primaryRegistry, @NotNull PEDeferredRegister<SECONDARY> secondaryRegistry) {
+	public DoubleDeferredRegister(@NotNull PEDeferredRegister<PRIMARY> primaryRegistry, @NotNull PEDeferredRegister<SECONDARY> secondaryRegistry) {
 		this.primaryRegister = primaryRegistry;
 		this.secondaryRegister = secondaryRegistry;
 	}
 
-	protected DoublePEDeferredRegister(ResourceKey<? extends Registry<PRIMARY>> primaryRegistryName, ResourceKey<? extends Registry<SECONDARY>> secondaryRegistryName,
+	protected DoubleDeferredRegister(ResourceKey<? extends Registry<PRIMARY>> primaryRegistryName, ResourceKey<? extends Registry<SECONDARY>> secondaryRegistryName,
 			String modid) {
 		this(primaryRegistryName, PEDeferredRegister.create(secondaryRegistryName, modid), modid);
 	}
 
-	protected DoublePEDeferredRegister(ResourceKey<? extends Registry<PRIMARY>> primaryRegistryName, PEDeferredRegister<SECONDARY> secondaryRegistry, String modid) {
+	protected DoubleDeferredRegister(ResourceKey<? extends Registry<PRIMARY>> primaryRegistryName, PEDeferredRegister<SECONDARY> secondaryRegistry, String modid) {
 		this(PEDeferredRegister.create(primaryRegistryName, modid), secondaryRegistry);
 	}
 

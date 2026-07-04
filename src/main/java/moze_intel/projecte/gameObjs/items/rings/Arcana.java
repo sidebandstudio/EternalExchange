@@ -1,14 +1,10 @@
 package moze_intel.projecte.gameObjs.items.rings;
 
-import com.google.common.base.Suppliers;
-import com.google.common.collect.Multimap;
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.IntFunction;
-import java.util.function.Supplier;
-import moze_intel.projecte.PECore;
 import moze_intel.projecte.api.capabilities.item.IExtraFunction;
 import moze_intel.projecte.api.capabilities.item.IProjectileShooter;
 import moze_intel.projecte.gameObjs.entity.EntityFireProjectile;
@@ -21,15 +17,12 @@ import moze_intel.projecte.gameObjs.items.ItemPE;
 import moze_intel.projecte.gameObjs.items.rings.Arcana.ArcanaMode;
 import moze_intel.projecte.gameObjs.registries.PEDataComponentTypes;
 import moze_intel.projecte.gameObjs.registries.PESoundEvents;
-import moze_intel.projecte.integration.IntegrationHelper;
-import moze_intel.projecte.integration.curios.IExposesCurioAttributes;
 import moze_intel.projecte.utils.PlayerHelper;
 import moze_intel.projecte.utils.WorldHelper;
 import moze_intel.projecte.utils.text.IHasTranslationKey;
 import moze_intel.projecte.utils.text.PELang;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -44,66 +37,40 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlotGroup;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.Snowball;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import moze_intel.projecte.compat.ItemAbilities;
 import moze_intel.projecte.compat.ItemAbility;
-import net.neoforged.neoforge.common.NeoForgeMod;
+import moze_intel.projecte.compat.ItemAbilityHelper;
 import org.jetbrains.annotations.NotNull;
 
-public class Arcana extends ItemPE implements IItemMode<ArcanaMode>, IFireProtector, IExtraFunction, IProjectileShooter, ICapabilityAware, IExposesCurioAttributes {
-
-	private static final AttributeModifier FLIGHT = new AttributeModifier(PECore.rl("arcana_flight"), 1, Operation.ADD_VALUE);
-	private final Supplier<ItemAttributeModifiers> defaultModifiers;
+public class Arcana extends ItemPE implements IItemMode<ArcanaMode>, IFireProtector, IExtraFunction, IProjectileShooter, ICapabilityAware, ItemAbilityHelper.AbilityAware {
 
 	public Arcana(Properties props) {
-		super(props.component(PEDataComponentTypes.ACTIVE, false)
-				.component(PEDataComponentTypes.ARCANA_MODE, ArcanaMode.ZERO)
-				.component(PEDataComponentTypes.STORED_EMC, 0L)
+		super(props.component(PEDataComponentTypes.ACTIVE.get(), false)
+				.component(PEDataComponentTypes.ARCANA_MODE.get(), ArcanaMode.ZERO)
+				.component(PEDataComponentTypes.STORED_EMC.get(), 0L)
 		);
-		this.defaultModifiers = Suppliers.memoize(() -> ItemAttributeModifiers.builder()
-				.add(NeoForgeMod.CREATIVE_FLIGHT, FLIGHT, EquipmentSlotGroup.ANY)
-				.build());
+		//Fabric port: upstream added a NeoForge CREATIVE_FLIGHT attribute modifier (also exposed to Curios); there is no flight attribute on Fabric,
+		// so creative flight for the ring is handled by handlers/InternalAbilities instead
 	}
 
 	@NotNull
 	@Override
-	@Deprecated
-	public ItemAttributeModifiers getDefaultAttributeModifiers() {
-		return this.defaultModifiers.get();
-	}
-
-	@Override
-	public void addAttributes(Multimap<Holder<Attribute>, AttributeModifier> attributes) {
-		attributes.put(NeoForgeMod.CREATIVE_FLIGHT, FLIGHT);
-	}
-
-	@Override
-	public boolean hasCraftingRemainingItem(@NotNull ItemStack stack) {
-		return true;
-	}
-
-	@NotNull
-	@Override
-	public ItemStack getCraftingRemainingItem(ItemStack stack) {
+	public ItemStack getRecipeRemainder(@NotNull ItemStack stack) {
+		//Fabric port: replaces NeoForge's stack aware getCraftingRemainingItem
 		return stack.copy();
 	}
 
 	private void tick(ItemStack stack, Level level, ServerPlayer player) {
-		if (stack.getOrDefault(PEDataComponentTypes.ACTIVE, false)) {
+		if (stack.getOrDefault(PEDataComponentTypes.ACTIVE.get(), false)) {
 			switch (getMode(stack)) {
 				case ZERO -> WorldHelper.freezeInBoundingBox(level, player.getBoundingBox().inflate(5), player, true);
 				case IGNITION -> WorldHelper.igniteNearby(level, player);
@@ -124,7 +91,7 @@ public class Arcana extends ItemPE implements IItemMode<ArcanaMode>, IFireProtec
 	@Override
 	public void appendHoverText(@NotNull ItemStack stack, @NotNull Item.TooltipContext context, @NotNull List<Component> tooltip, @NotNull TooltipFlag flags) {
 		super.appendHoverText(stack, context, tooltip, flags);
-		if (stack.getOrDefault(PEDataComponentTypes.ACTIVE, false)) {
+		if (stack.getOrDefault(PEDataComponentTypes.ACTIVE.get(), false)) {
 			tooltip.add(getToolTip(stack));
 		} else {
 			tooltip.add(PELang.TOOLTIP_ARCANA_INACTIVE.translateColored(ChatFormatting.RED));
@@ -136,7 +103,7 @@ public class Arcana extends ItemPE implements IItemMode<ArcanaMode>, IFireProtec
 	public InteractionResultHolder<ItemStack> use(@NotNull Level level, @NotNull Player player, @NotNull InteractionHand hand) {
 		if (!level.isClientSide) {
 			ItemStack stack = player.getItemInHand(hand);
-			stack.update(PEDataComponentTypes.ACTIVE, false, active -> !active);
+			stack.update(PEDataComponentTypes.ACTIVE.get(), false, active -> !active);
 		}
 		return InteractionResultHolder.success(player.getItemInHand(hand));
 	}
@@ -210,15 +177,13 @@ public class Arcana extends ItemPE implements IItemMode<ArcanaMode>, IFireProtec
 
 	@Override
 	public boolean canPerformAction(@NotNull ItemStack stack, @NotNull ItemAbility action) {
-		if (action == ItemAbilities.FIRESTARTER_LIGHT && getMode(stack) == ArcanaMode.IGNITION) {
-			return true;
-		}
-		return moze_intel.projecte.compat.ItemAbilityHelper.canPerformAction(moze_intel.projecte.compat.ItemAbilityHelper, super, stack, action);
+		//Fabric port: upstream fell back to the NeoForge super implementation, which returns false for plain items
+		return action == ItemAbilities.FIRESTARTER_LIGHT && getMode(stack) == ArcanaMode.IGNITION;
 	}
 
 	@Override
-	public void attachCapabilities(RegisterCapabilitiesEvent event) {
-		IntegrationHelper.registerCuriosCapability(event, this);
+	public void attachCapabilities() {
+		//Fabric port: Curios/Trinkets integration not ported
 	}
 
 	@Override

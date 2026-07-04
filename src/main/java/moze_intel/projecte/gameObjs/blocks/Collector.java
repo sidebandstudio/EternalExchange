@@ -3,6 +3,7 @@ package moze_intel.projecte.gameObjs.blocks;
 import java.util.List;
 import moze_intel.projecte.api.capabilities.PECapabilities;
 import moze_intel.projecte.api.capabilities.item.IItemEmcHolder;
+import moze_intel.projecte.compat.network.PEMenuHelper;
 import moze_intel.projecte.config.ProjectEConfig;
 import moze_intel.projecte.gameObjs.EnumCollectorTier;
 import moze_intel.projecte.gameObjs.block_entities.CollectorMK1BlockEntity;
@@ -16,6 +17,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -24,7 +26,6 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
 import moze_intel.projecte.compat.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,8 +51,9 @@ public class Collector extends BlockDirection implements PEEntityBlock<Collector
 			return InteractionResult.SUCCESS;
 		}
 		CollectorMK1BlockEntity collector = WorldHelper.getBlockEntity(CollectorMK1BlockEntity.class, level, pos, true);
-		if (collector != null) {
-			player.openMenu(collector, pos);
+		if (collector != null && player instanceof ServerPlayer serverPlayer) {
+			//Fabric port: replaces NeoForge's openMenu(provider, pos); the client container factory reads the position back
+			PEMenuHelper.openMenu(serverPlayer, collector, buf -> buf.writeBlockPos(pos));
 		}
 		return InteractionResult.CONSUME;
 	}
@@ -96,7 +98,8 @@ public class Collector extends BlockDirection implements PEEntityBlock<Collector
 			//If something went wrong fallback to default implementation
 			return super.getAnalogOutputSignal(state, level, pos);
 		}
-		IItemHandler handler = WorldHelper.getCapability(level, ItemHandler.BLOCK, pos, state, collector, Direction.UP);
+		//Fabric port: no block item handler capability lookup; query the collector's sided inventory directly
+		IItemHandler handler = collector.getItemHandler(Direction.UP);
 		if (handler == null) {
 			//If something went wrong fallback to default implementation
 			return super.getAnalogOutputSignal(state, level, pos);

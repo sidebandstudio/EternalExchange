@@ -1,5 +1,6 @@
 package moze_intel.projecte.gameObjs.block_entities;
 
+import moze_intel.projecte.compat.items.wrapper.CombinedInvWrapper;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -8,6 +9,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import moze_intel.projecte.api.capabilities.PECapabilities;
 import moze_intel.projecte.api.capabilities.item.IItemEmcHolder;
 import moze_intel.projecte.gameObjs.blocks.MatterFurnace;
@@ -17,6 +19,7 @@ import moze_intel.projecte.gameObjs.registration.impl.BlockEntityTypeRegistryObj
 import moze_intel.projecte.gameObjs.registries.PEBlockEntityTypes;
 import moze_intel.projecte.utils.WorldHelper;
 import moze_intel.projecte.utils.text.PELang;
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.SharedConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -28,12 +31,14 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.RecipeCraftingHolder;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -44,23 +49,20 @@ import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.Hopper;
+import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
-import net.neoforged.neoforge.capabilities.ICapabilityProvider;
-import net.neoforged.neoforge.common.Tags;
 import moze_intel.projecte.compat.items.IItemHandler;
 import moze_intel.projecte.compat.items.IItemHandlerModifiable;
 import moze_intel.projecte.compat.items.ItemHandlerHelper;
-import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
+import moze_intel.projecte.compat.items.wrapper.InvWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
-public class DMFurnaceBlockEntity extends EmcBlockEntity implements MenuProvider, RecipeCraftingHolder {
+public class DMFurnaceBlockEntity extends EmcBlockEntity implements MenuProvider, RecipeCraftingHolder, IItemHandlerBlockEntity {
 
-	public static final ICapabilityProvider<DMFurnaceBlockEntity, @Nullable Direction, IItemHandler> INVENTORY_PROVIDER = (furnace, side) -> {
+	public static final BiFunction<DMFurnaceBlockEntity, @Nullable Direction, IItemHandler> INVENTORY_PROVIDER = (furnace, side) -> {
 		if (side == null) {
 			return furnace.joined;
 		} else if (side == Direction.UP) {
@@ -108,11 +110,6 @@ public class DMFurnaceBlockEntity extends EmcBlockEntity implements MenuProvider
 	private final Object2IntOpenHashMap<ResourceLocation> recipesUsed = new Object2IntOpenHashMap<>();
 	private final RecipeManager.CachedCheck<SingleRecipeInput, SmeltingRecipe> quickCheck;
 
-	@Nullable
-	private BlockCapabilityCache<IItemHandler, @Nullable Direction> pullTarget;
-	@Nullable
-	private BlockCapabilityCache<IItemHandler, @Nullable Direction> pushTarget;
-
 	public int litTime;
 	public int litDuration;
 	public int cookingProgress;
@@ -147,14 +144,7 @@ public class DMFurnaceBlockEntity extends EmcBlockEntity implements MenuProvider
 		this.joined = new CombinedInvWrapper(automationInput, automationFuel, automationOutput);
 	}
 
-	@Override
-	public void setLevel(@NotNull Level level) {
-		super.setLevel(level);
-		if (level instanceof ServerLevel serverLevel) {
-			pullTarget = BlockCapabilityCache.create(ItemHandler.BLOCK, serverLevel, worldPosition.above(), Direction.DOWN);
-			pushTarget = BlockCapabilityCache.create(ItemHandler.BLOCK, serverLevel, worldPosition.below(), Direction.UP);
-		}
-	}
+	//Fabric port: NeoForge created BlockCapabilityCaches for the block above/below in setLevel; Fabric lookups are not cached, see getNeighborItemHandler
 
 	@Override
 	protected boolean canProvideEmc() {
@@ -176,9 +166,9 @@ public class DMFurnaceBlockEntity extends EmcBlockEntity implements MenuProvider
 	}
 
 	protected float getDoubleChance(ItemStack input) {
-		if (input.is(Tags.Items.ORES)) {
+		if (input.is(ConventionalItemTags.ORES)) {
 			return getOreDoubleChance();
-		} else if (input.is(Tags.Items.RAW_MATERIALS)) {
+		} else if (input.is(ConventionalItemTags.RAW_MATERIALS)) {
 			//Base rate for raw ore doubling chance is: 1 -> 1.333 which means we multiply our ore double chance by 2/3
 			return getOreDoubleChance() * 2 / 3;
 		}
@@ -226,6 +216,12 @@ public class DMFurnaceBlockEntity extends EmcBlockEntity implements MenuProvider
 		return outputInventory;
 	}
 
+	//Fabric port: allows our blocks to query the inventory NeoForge exposed via the item handler block capability
+	@Override
+	public IItemHandler getItemHandler(@Nullable Direction side) {
+		return INVENTORY_PROVIDER.apply(this, side);
+	}
+
 	public static void tickServer(Level level, BlockPos pos, BlockState state, DMFurnaceBlockEntity furnace) {
 		boolean wasBurning = furnace.isLit();
 		int lastLitTime = furnace.litTime;
@@ -264,7 +260,9 @@ public class DMFurnaceBlockEntity extends EmcBlockEntity implements MenuProvider
 					fuelItem.shrink(1);
 					furnace.fuelInv.onContentsChanged(0);
 					if (fuelItem.isEmpty()) {
-						furnace.fuelInv.setStackInSlot(0, copy.getItem().getCraftingRemainingItem(copy));
+						//Fabric port: vanilla crafting remainders are per item rather than stack-aware
+						Item remainder = copy.getItem().getCraftingRemainingItem();
+						furnace.fuelInv.setStackInSlot(0, remainder == null ? ItemStack.EMPTY : new ItemStack(remainder));
 					}
 					furnace.markDirty(level, pos, false);
 				}
@@ -300,11 +298,25 @@ public class DMFurnaceBlockEntity extends EmcBlockEntity implements MenuProvider
 		return WorldHelper.getBlockEntity(level, position) instanceof Hopper;
 	}
 
+	/**
+	 * Fabric port: replaces NeoForge's cached ItemHandler.BLOCK capability lookups. Our own block entities keep their sided handlers; other blocks are only supported if
+	 * they are vanilla Containers (no cross-mod item handler interop yet), found hopper-style, so container entities occupying the position also count and
+	 * WorldlyContainer side restrictions are not applied.
+	 */
+	@Nullable
+	private static IItemHandler getNeighborItemHandler(@NotNull Level level, @NotNull BlockPos pos, @NotNull Direction side) {
+		if (WorldHelper.getBlockEntity(level, pos) instanceof IItemHandlerBlockEntity handlerBE) {
+			return handlerBE.getItemHandler(side);
+		}
+		Container container = HopperBlockEntity.getContainerAt(level, pos);
+		return container == null ? null : new InvWrapper(container);
+	}
+
 	private void pullFromInventories(@NotNull Level level, @NotNull BlockPos pos) {
-		if (pullTarget == null || isHopper(level, pos.above())) {
+		if (isHopper(level, pos.above())) {
 			return;
 		}
-		IItemHandler handler = pullTarget.getCapability();
+		IItemHandler handler = getNeighborItemHandler(level, pos.above(), Direction.DOWN);
 		if (handler != null) {
 			for (int i = 0, slots = handler.getSlots(); i < slots; i++) {
 				ItemStack extractTest = handler.extractItem(i, Integer.MAX_VALUE, true);
@@ -317,10 +329,10 @@ public class DMFurnaceBlockEntity extends EmcBlockEntity implements MenuProvider
 	}
 
 	private void pushToInventories(@NotNull Level level, @NotNull BlockPos pos) {
-		if (pushTarget == null || outputInventory.isEmpty() || isHopper(level, pos.below())) {
+		if (outputInventory.isEmpty() || isHopper(level, pos.below())) {
 			return;
 		}
-		IItemHandler targetInv = pushTarget.getCapability();
+		IItemHandler targetInv = getNeighborItemHandler(level, pos.below(), Direction.UP);
 		if (targetInv != null) {
 			for (int i = 0, slots = outputInventory.getSlots(); i < slots; i++) {
 				ItemStack extractTest = outputInventory.extractItem(i, Integer.MAX_VALUE, true);
@@ -399,7 +411,8 @@ public class DMFurnaceBlockEntity extends EmcBlockEntity implements MenuProvider
 	}
 
 	private int getItemBurnTime(ItemStack stack) {
-		return stack.getBurnTime(RecipeType.SMELTING) * ticksBeforeSmelt / AbstractFurnaceBlockEntity.BURN_TIME_STANDARD * efficiencyBonus;
+		//Fabric port: vanilla furnace fuel map instead of NeoForge's per-stack burn time hook
+		return AbstractFurnaceBlockEntity.getFuel().getOrDefault(stack.getItem(), 0) * ticksBeforeSmelt / AbstractFurnaceBlockEntity.BURN_TIME_STANDARD * efficiencyBonus;
 	}
 
 	private int getTotalCookTime(RecipeResult recipeResult) {

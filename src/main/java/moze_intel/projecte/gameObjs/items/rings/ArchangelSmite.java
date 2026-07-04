@@ -25,20 +25,16 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.util.FakePlayerFactory;
-import net.neoforged.neoforge.common.util.TriState;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class ArchangelSmite extends PEToggleItem implements IPedestalItem {
 
 	public ArchangelSmite(Properties props) {
-		super(props.component(PEDataComponentTypes.STORED_EMC, 0L));
-		NeoForge.EVENT_BUS.addListener(this::emptyLeftClick);
-		NeoForge.EVENT_BUS.addListener(this::leftClickBlock);
+		super(props.component(PEDataComponentTypes.STORED_EMC.get(), 0L));
+		//Fabric port: upstream registered emptyLeftClick/leftClickBlock on the NeoForge event bus here
 	}
 
 	public static void fireVolley(ItemStack stack, Player player) {
@@ -47,22 +43,25 @@ public class ArchangelSmite extends PEToggleItem implements IPedestalItem {
 		}
 	}
 
-	private void emptyLeftClick(PlayerInteractEvent.LeftClickEmpty evt) {
+	//Fabric port: upstream subscribed this to NeoForge's PlayerInteractEvent.LeftClickEmpty; needs a client side left click miss hook to call it
+	public void emptyLeftClick() {
 		PECore.packetHandler().activateArchangel();
 	}
 
-	private void leftClickBlock(PlayerInteractEvent.LeftClickBlock evt) {
-		if (!evt.getLevel().isClientSide && evt.getUseItem() != TriState.FALSE && !evt.getItemStack().isEmpty() && evt.getItemStack().is(this)) {
-			fireVolley(evt.getItemStack(), evt.getEntity());
+	//Fabric port: upstream subscribed this to NeoForge's PlayerInteractEvent.LeftClickBlock (its use-item deny check has no equivalent);
+	// needs wiring to Fabric's AttackBlockCallback
+	public void leftClickBlock(Player player, ItemStack stack) {
+		if (!player.level().isClientSide && !stack.isEmpty() && stack.is(this)) {
+			fireVolley(stack, player);
 		}
 	}
 
-	@Override
+	//Fabric port: NeoForge's IItemExtension#onLeftClickEntity hook; needs wiring to Fabric's AttackEntityCallback (false = do not cancel the attack, matching upstream)
 	public boolean onLeftClickEntity(@NotNull ItemStack stack, Player player, @NotNull Entity entity) {
 		if (!player.level().isClientSide) {
 			fireVolley(stack, player);
 		}
-		return super.onLeftClickEntity(stack, player, entity);
+		return false;
 	}
 
 	@Override
@@ -101,7 +100,7 @@ public class ArchangelSmite extends PEToggleItem implements IPedestalItem {
 					double centeredY = pos.getY() + 0.5;
 					double centeredZ = pos.getZ() + 0.5;
 					for (int i = 0; i < 3; i++) {
-						EntityHomingArrow arrow = new EntityHomingArrow(level, FakePlayerFactory.get((ServerLevel) level, PECore.FAKEPLAYER_GAMEPROFILE), 2.0F);
+						EntityHomingArrow arrow = new EntityHomingArrow(level, FakePlayer.get((ServerLevel) level, PECore.FAKEPLAYER_GAMEPROFILE), 2.0F);
 						arrow.setPosRaw(centeredX, centeredY + 2, centeredZ);
 						arrow.setDeltaMovement(0, 1, 0);
 						arrow.playSound(SoundEvents.ARROW_SHOOT, 1.0F, 1.0F / (level.random.nextFloat() * 0.4F + 1.2F) + 0.5F);

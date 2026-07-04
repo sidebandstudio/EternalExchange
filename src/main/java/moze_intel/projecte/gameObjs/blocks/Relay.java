@@ -1,6 +1,7 @@
 package moze_intel.projecte.gameObjs.blocks;
 
 import java.util.List;
+import moze_intel.projecte.compat.network.PEMenuHelper;
 import moze_intel.projecte.config.ProjectEConfig;
 import moze_intel.projecte.gameObjs.EnumRelayTier;
 import moze_intel.projecte.gameObjs.block_entities.RelayMK1BlockEntity;
@@ -13,6 +14,7 @@ import moze_intel.projecte.utils.text.PELang;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -45,8 +47,9 @@ public class Relay extends BlockDirection implements PEEntityBlock<RelayMK1Block
 			return InteractionResult.SUCCESS;
 		}
 		RelayMK1BlockEntity relay = WorldHelper.getBlockEntity(RelayMK1BlockEntity.class, level, pos, true);
-		if (relay != null) {
-			player.openMenu(relay, pos);
+		if (relay != null && player instanceof ServerPlayer serverPlayer) {
+			//Fabric port: replaces NeoForge's openMenu(provider, pos); the client container factory reads the position back
+			PEMenuHelper.openMenu(serverPlayer, relay, buf -> buf.writeBlockPos(pos));
 		}
 		return InteractionResult.CONSUME;
 	}
