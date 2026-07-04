@@ -4,9 +4,9 @@
 	"compatibilityLevel": "JAVA_21",
 	"minVersion": "0.8",
 	"mixins": [
+		"PlayerAttachmentsMixin"
 	],
-	"client": [
-	],
+	"client": [],
 	"injectors": {
 		"defaultRequire": 1
 	}

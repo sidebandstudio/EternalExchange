@@ -1,4 +1,4 @@
-package moze_intel.projecte.compat.registries;
+package moze_intel.projecte.gameObjs.registration;
 
 import com.mojang.datafixers.util.Either;
 import java.util.Optional;
@@ -8,64 +8,77 @@ import java.util.stream.Stream;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderOwner;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
- * Fabric port shim: equivalent of NeoForge's DeferredHolder — a {@link Holder} that resolves lazily from the registry on first access, so static references can be
- * created before registration runs.
+ * Fabric port: reimplementation of upstream's DeferredHolder-based wrapper. The value and vanilla holder are bound when the owning
+ * {@link PEDeferredRegister#register()} runs during mod init.
  */
-public class PEDeferredHolder<R> implements Holder<R>, Supplier<R> {
+public class PEDeferredHolder<R, T extends R> implements Holder<R>, Supplier<T>, INamedEntry {
 
 	private final ResourceKey<R> key;
-	private Holder<R> resolved;
+	@Nullable
+	private T value;
+	@Nullable
+	private Holder<R> holder;
 
-	protected PEDeferredHolder(ResourceKey<R> key) {
+	public PEDeferredHolder(ResourceKey<? extends Registry<R>> registryKey, ResourceLocation valueName) {
+		this(ResourceKey.create(registryKey, valueName));
+	}
+
+	public PEDeferredHolder(ResourceKey<R> key) {
 		this.key = key;
 	}
 
-	public static <R> PEDeferredHolder<R> create(ResourceKey<? extends Registry<R>> registryKey, ResourceLocation name) {
-		return new PEDeferredHolder<>(ResourceKey.create(registryKey, name));
+	/**
+	 * Called by {@link PEDeferredRegister} once the backing object has been registered.
+	 */
+	void bind(T value, Holder<R> holder) {
+		this.value = value;
+		this.holder = holder;
 	}
 
-	@SuppressWarnings("unchecked")
-	protected Holder<R> resolve() {
-		if (resolved == null) {
-			Registry<R> registry = (Registry<R>) BuiltInRegistries.REGISTRY.get(key.registry());
-			if (registry == null) {
-				throw new IllegalStateException("Registry not present: " + key.registry());
-			}
-			resolved = registry.getHolderOrThrow(key);
+	protected Holder<R> holderOrThrow() {
+		if (holder == null) {
+			throw new IllegalStateException("Registry object not present: " + key.location());
 		}
-		return resolved;
+		return holder;
 	}
 
-	public ResourceKey<R> getKey() {
-		return key;
+	@Override
+	public T get() {
+		if (value == null) {
+			throw new IllegalStateException("Registry object not present: " + key.location());
+		}
+		return value;
 	}
 
 	public ResourceLocation getId() {
 		return key.location();
 	}
 
+	public ResourceKey<R> getKey() {
+		return key;
+	}
+
 	@Override
-	public R get() {
-		return value();
+	public String getName() {
+		return getId().getPath();
 	}
 
 	@Override
 	@NotNull
 	public R value() {
-		return resolve().value();
+		return get();
 	}
 
 	@Override
 	public boolean isBound() {
-		Registry<?> registry = BuiltInRegistries.REGISTRY.get(key.registry());
-		return registry != null && registry.containsKey(key.location());
+		return value != null;
 	}
 
 	@Override
@@ -85,19 +98,19 @@ public class PEDeferredHolder<R> implements Holder<R>, Supplier<R> {
 
 	@Override
 	public boolean is(@NotNull TagKey<R> tagKey) {
-		return resolve().is(tagKey);
+		return holderOrThrow().is(tagKey);
 	}
 
 	@Override
 	@Deprecated
-	public boolean is(@NotNull Holder<R> holder) {
-		return resolve().is(holder);
+	public boolean is(@NotNull Holder<R> other) {
+		return holderOrThrow().is(other);
 	}
 
 	@Override
 	@NotNull
 	public Stream<TagKey<R>> tags() {
-		return resolve().tags();
+		return holderOrThrow().tags();
 	}
 
 	@Override
@@ -120,6 +133,6 @@ public class PEDeferredHolder<R> implements Holder<R>, Supplier<R> {
 
 	@Override
 	public boolean canSerializeIn(@NotNull HolderOwner<R> owner) {
-		return resolve().canSerializeIn(owner);
+		return holderOrThrow().canSerializeIn(owner);
 	}
 }

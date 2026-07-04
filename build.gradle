@@ -19,6 +19,8 @@ repositories {
 sourceSets.main.java.srcDir 'src/api/java'
 
 loom {
+	accessWidenerPath = file("src/main/resources/projecte.accesswidener")
+
 	mods {
 		"projecte" {
 			sourceSet sourceSets.main

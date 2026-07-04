@@ -4,7 +4,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
-import moze_intel.projecte.compat.registries.PEDeferredHolder;
+import moze_intel.projecte.compat.registries.LazyRegistryHolder;
 
 public final class PESounds {
 
@@ -21,6 +21,6 @@ public final class PESounds {
 	}
 
 	private static Holder<SoundEvent> get(String name) {
-		return PEDeferredHolder.create(Registries.SOUND_EVENT, ResourceLocation.fromNamespaceAndPath(ProjectEAPI.PROJECTE_MODID, name));
+		return LazyRegistryHolder.create(Registries.SOUND_EVENT, ResourceLocation.fromNamespaceAndPath(ProjectEAPI.PROJECTE_MODID, name));
 	}
 }
