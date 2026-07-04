@@ -33,14 +33,10 @@ public class Zero extends PEToggleItem implements IPedestalItem, IItemCharge, IB
 		super(props.component(PEDataComponentTypes.CHARGE.get(), 0));
 	}
 
-	@Override
-	public boolean hasCraftingRemainingItem(@NotNull ItemStack stack) {
-		return true;
-	}
-
 	@NotNull
 	@Override
-	public ItemStack getCraftingRemainingItem(ItemStack stack) {
+	public ItemStack getRecipeRemainder(@NotNull ItemStack stack) {
+		//Fabric port: replaces NeoForge's stack aware getCraftingRemainingItem
 		return stack.copy();
 	}
 

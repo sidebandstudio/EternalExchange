@@ -28,9 +28,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import moze_intel.projecte.compat.ItemAbilities;
 import moze_intel.projecte.compat.ItemAbility;
+import moze_intel.projecte.compat.ItemAbilityHelper;
 import org.jetbrains.annotations.NotNull;
 
-public class Ignition extends PEToggleItem implements IPedestalItem, IFireProtector, IProjectileShooter, ICapabilityAware {
+public class Ignition extends PEToggleItem implements IPedestalItem, IFireProtector, IProjectileShooter, ICapabilityAware, ItemAbilityHelper.AbilityAware {
 
 	public Ignition(Properties props) {
 		super(props.component(PEDataComponentTypes.STORED_EMC.get(), 0L)
@@ -105,7 +106,8 @@ public class Ignition extends PEToggleItem implements IPedestalItem, IFireProtec
 
 	@Override
 	public boolean canPerformAction(@NotNull ItemStack stack, @NotNull ItemAbility action) {
-		return action == ItemAbilities.FIRESTARTER_LIGHT || moze_intel.projecte.compat.ItemAbilityHelper.canPerformAction(super, stack, action);
+		//Fabric port: upstream fell back to the NeoForge super implementation, which returns false for plain items
+		return action == ItemAbilities.FIRESTARTER_LIGHT;
 	}
 
 	@Override

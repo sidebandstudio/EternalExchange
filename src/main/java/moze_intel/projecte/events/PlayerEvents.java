@@ -33,6 +33,9 @@ import net.minecraft.world.item.ItemStack;
 public class PlayerEvents {
 
 	public static void register() {
+		//Fabric port: creative pedestal breaking first pops the held item instead of destroying the pedestal (upstream: onDestroyedByPlayer)
+		net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents.BEFORE.register((level, player, pos, state, blockEntity) ->
+				moze_intel.projecte.gameObjs.blocks.Pedestal.onDestroyedByPlayer(level, player, pos, state));
 		//On death or return from end, sync to the client
 		ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, player, alive) -> {
 			syncData(player);

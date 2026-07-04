@@ -28,7 +28,10 @@ public final class FireHelper {
 	 * NeoForge's onCaughtFire lets blocks respond to being lit; vanilla only has special-cased TNT, which is what ProjectE relies on.
 	 */
 	public static void onCaughtFire(BlockState state, Level level, BlockPos pos, @Nullable Direction face, @Nullable LivingEntity igniter) {
-		if (state.getBlock() instanceof TntBlock) {
+		if (state.getBlock() instanceof moze_intel.projecte.gameObjs.blocks.ProjectETNT peTnt) {
+			peTnt.onCaughtFire(state, level, pos, face, igniter);
+			level.removeBlock(pos, false);
+		} else if (state.getBlock() instanceof TntBlock) {
 			if (!level.isClientSide) {
 				PrimedTnt primedTnt = new PrimedTnt(level, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, igniter);
 				level.addFreshEntity(primedTnt);

@@ -76,7 +76,7 @@ public class Pedestal extends Block implements SimpleWaterloggedBlock, PEEntityB
 	/**
 	 * @return True if there was an item and it got dropped, false otherwise.
 	 */
-	private boolean dropItem(Level level, BlockPos pos) {
+	public boolean dropItem(Level level, BlockPos pos) {
 		DMPedestalBlockEntity pedestal = WorldHelper.getBlockEntity(DMPedestalBlockEntity.class, level, pos);
 		if (pedestal != null) {
 			ItemStack stack = pedestal.getInventory().getStackInSlot(0);
@@ -106,16 +106,18 @@ public class Pedestal extends Block implements SimpleWaterloggedBlock, PEEntityB
 		}
 	}
 
-	@Override
-	public boolean onDestroyedByPlayer(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, Player player, boolean willHarvest, @NotNull FluidState fluid) {
-		if (player.isCreative() && dropItem(level, pos)) {
-			//If the player is creative, try to drop the item, and if we succeeded return false to cancel removing the pedestal
+	/**
+	 * Fabric port: replaces NeoForge's onDestroyedByPlayer cancel — registered with PlayerBlockBreakEvents.BEFORE from PECore.
+	 * If the player is creative, try to drop the item, and if we succeeded return false to cancel removing the pedestal.
+	 */
+	public static boolean onDestroyedByPlayer(Level level, Player player, BlockPos pos, BlockState state) {
+		if (state.getBlock() instanceof Pedestal pedestal && player.isCreative() && pedestal.dropItem(level, pos)) {
 			// Note: we notify the block of an update to make sure that it re-appears visually on the client instead of having there
 			// be a desync
 			level.sendBlockUpdated(pos, state, state, Block.UPDATE_IMMEDIATE);
 			return false;
 		}
-		return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+		return true;
 	}
 
 	@NotNull

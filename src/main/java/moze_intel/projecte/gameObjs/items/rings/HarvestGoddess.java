@@ -35,9 +35,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.BlockHitResult;
-import net.neoforged.neoforge.common.SpecialPlantable;
-import net.neoforged.neoforge.event.EventHooks;
-import net.neoforged.neoforge.event.entity.player.BonemealEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class HarvestGoddess extends PEToggleItem implements IPedestalItem {
@@ -100,15 +97,11 @@ public class HarvestGoddess extends PEToggleItem implements IPedestalItem {
 		for (BlockPos currentPos : WorldHelper.horizontalPositionsAround(pos, 15)) {
 			boolean wasSuccessful = false;
 			BlockState state = level.getBlockState(currentPos);
-			//TODO: Do we want to fire this with a different stack if we have already used the four that we accounted?
-			BonemealEvent event = EventHooks.fireBonemealEvent(player, level, currentPos, state, stack);
-			if (event.isCanceled()) {
-				wasSuccessful = event.isSuccessful();
-			} else if (event.isValidBonemealTarget()) {
+			//Fabric port: no bonemeal event on Fabric; inline the vanilla validity check upstream's event defaulted to
+			if (state.getBlock() instanceof BonemealableBlock growable && growable.isValidBonemealTarget(level, currentPos, state)) {
 				wasSuccessful = true;
 				if (level instanceof ServerLevel serverLevel) {
 					//Note: We mirror vanilla only checking isBonemealSuccess on the server side
-					BonemealableBlock growable = (BonemealableBlock) state.getBlock();
 					if (growable.isBonemealSuccess(level, level.random, currentPos, state)) {
 						growable.performBonemeal(serverLevel, level.random, currentPos, state);
 						player.gameEvent(GameEvent.ITEM_INTERACT_FINISH);
@@ -160,13 +153,8 @@ public class HarvestGoddess extends PEToggleItem implements IPedestalItem {
 			for (Iterator<ItemStack> iterator = seeds.iterator(); iterator.hasNext(); ) {
 				ItemStack stack = iterator.next();
 				boolean planted = false;
-				//Note: Unlike the patched in check in HarvestFarmland, we check special plantable before falling back to the item as a block item
-				if (stack.getItem() instanceof SpecialPlantable plantable) {
-					if (plantable.canPlacePlantAtPosition(stack, level, plantPos, Direction.DOWN)) {
-						plantable.spawnPlantAtPosition(stack, level, plantPos, Direction.DOWN);
-						planted = true;
-					}
-				} else if (stack.is(PETags.Items.PLANTABLE_SEEDS) && stack.getItem() instanceof BlockItem blockItem) {
+				//Fabric port: NeoForge's SpecialPlantable extension has no Fabric equivalent; only tag based block item seeds are supported
+				if (stack.is(PETags.Items.PLANTABLE_SEEDS) && stack.getItem() instanceof BlockItem blockItem) {
 					if (placeContext == null) {
 						placeContext = new BlockPlaceContext(level, player, InteractionHand.MAIN_HAND, stack, new BlockHitResult(
 								currentPos.getCenter().relative(Direction.UP, 0.5), Direction.UP, currentPos, false
@@ -212,7 +200,8 @@ public class HarvestGoddess extends PEToggleItem implements IPedestalItem {
 		for (ItemStack stack : inv) {
 			if (!stack.isEmpty()) {
 				Item item = stack.getItem();
-				if (item instanceof SpecialPlantable || stack.is(PETags.Items.PLANTABLE_SEEDS) && item instanceof BlockItem) {
+				//Fabric port: NeoForge's SpecialPlantable extension has no Fabric equivalent
+				if (stack.is(PETags.Items.PLANTABLE_SEEDS) && item instanceof BlockItem) {
 					result.add(stack);
 				}
 			}

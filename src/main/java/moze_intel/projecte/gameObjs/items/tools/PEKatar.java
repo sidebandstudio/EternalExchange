@@ -42,13 +42,26 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.common.IShearable;
+import java.util.Set;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Shearable;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import moze_intel.projecte.compat.ItemAbilities;
 import moze_intel.projecte.compat.ItemAbility;
+import moze_intel.projecte.compat.ItemAbilityHelper;
 import moze_intel.projecte.compat.events.ItemAttributeModifierEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class PEKatar extends PETool implements IItemMode<KatarMode>, IExtraFunction, IHasConditionalAttributes {
+public class PEKatar extends PETool implements IItemMode<KatarMode>, IExtraFunction, IHasConditionalAttributes, ItemAbilityHelper.AbilityAware {
+
+	//Fabric port: inlined copy of NeoForge's ItemAbilities.DEFAULT_AXE/SHEARS/SWORD/HOE_ACTIONS sets (the compat shim only defines the individual abilities)
+	private static final Set<ItemAbility> VANILLA_TOOL_ACTIONS = Set.of(
+			ItemAbilities.AXE_DIG, ItemAbilities.AXE_STRIP, ItemAbilities.AXE_SCRAPE, ItemAbilities.AXE_WAX_OFF,
+			ItemAbilities.SHEARS_DIG, ItemAbilities.SHEARS_HARVEST, ItemAbilities.SHEARS_CARVE, ItemAbilities.SHEARS_TRIM,
+			ItemAbilities.SWORD_DIG, ItemAbilities.SWORD_SWEEP,
+			ItemAbilities.HOE_DIG, ItemAbilities.HOE_TILL);
 
 	public PEKatar(IMatterType matterType, int numCharges, Properties props) {
 		super(matterType, PETags.Blocks.MINEABLE_WITH_PE_KATAR, numCharges, props.attributes(createAttributes(matterType, 19, -2.4F))
@@ -64,13 +77,11 @@ public class PEKatar extends PETool implements IItemMode<KatarMode>, IExtraFunct
 
 	@Override
 	public boolean canPerformAction(@NotNull ItemStack stack, @NotNull ItemAbility toolAction) {
-		return ItemAbilities.DEFAULT_AXE_ACTIONS.contains(toolAction) || ItemAbilities.DEFAULT_SHEARS_ACTIONS.contains(toolAction) ||
-			   ItemAbilities.DEFAULT_SWORD_ACTIONS.contains(toolAction) || ItemAbilities.DEFAULT_HOE_ACTIONS.contains(toolAction) ||
-			   ToolHelper.DEFAULT_PE_KATAR_ACTIONS.contains(toolAction);
+		return VANILLA_TOOL_ACTIONS.contains(toolAction) || ToolHelper.DEFAULT_PE_KATAR_ACTIONS.contains(toolAction);
 	}
 
+	//Fabric port: NeoForge's IItemExtension#getSweepHitBox has no vanilla equivalent; needs a sweep attack hook (mixin) to take effect
 	@NotNull
-	@Override
 	public AABB getSweepHitBox(@NotNull ItemStack stack, @NotNull Player player, @NotNull Entity target) {
 		int charge = getCharge(stack);
 		return target.getBoundingBox().inflate(charge, charge / 4D, charge);
