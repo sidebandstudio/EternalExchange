@@ -1,5 +1,6 @@
 package moze_intel.projecte.gameObjs.block_entities;
 
+import java.util.function.BiFunction;
 import moze_intel.projecte.api.block_entity.IRelay;
 import moze_intel.projecte.api.capabilities.PECapabilities;
 import moze_intel.projecte.api.capabilities.item.IItemEmcHolder;

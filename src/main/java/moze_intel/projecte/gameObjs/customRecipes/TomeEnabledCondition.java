@@ -1,26 +1,35 @@
 package moze_intel.projecte.gameObjs.customRecipes;
 
 import com.mojang.serialization.MapCodec;
+import moze_intel.projecte.PECore;
 import moze_intel.projecte.config.ProjectEConfig;
-import moze_intel.projecte.gameObjs.registries.PERecipeConditions;
-import net.neoforged.neoforge.common.conditions.ICondition;
-import org.jetbrains.annotations.NotNull;
+import net.fabricmc.fabric.api.resource.conditions.v1.ResourceCondition;
+import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditionType;
+import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
+import net.minecraft.core.HolderLookup;
+import org.jetbrains.annotations.Nullable;
 
-public class TomeEnabledCondition implements ICondition {
+//Fabric port: NeoForge ICondition replaced with Fabric's ResourceCondition; register() must be called once during mod init
+public class TomeEnabledCondition implements ResourceCondition {
 
 	public static final TomeEnabledCondition INSTANCE = new TomeEnabledCondition();
+	public static final MapCodec<TomeEnabledCondition> CODEC = MapCodec.unit(INSTANCE);
+	public static final ResourceConditionType<TomeEnabledCondition> TYPE = ResourceConditionType.create(PECore.rl("tome_enabled"), CODEC);
 
 	private TomeEnabledCondition() {
 	}
 
-	@Override
-	public boolean test(@NotNull IContext context) {
-		return ProjectEConfig.common.craftableTome.get();
+	public static void register() {
+		ResourceConditions.register(TYPE);
 	}
 
-	@NotNull
 	@Override
-	public MapCodec<? extends ICondition> codec() {
-		return PERecipeConditions.TOME_ENABLED.value();
+	public ResourceConditionType<?> getType() {
+		return TYPE;
+	}
+
+	@Override
+	public boolean test(@Nullable HolderLookup.Provider registryLookup) {
+		return ProjectEConfig.common.craftableTome.get();
 	}
 }

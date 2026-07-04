@@ -28,10 +28,8 @@ import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.neoforged.neoforge.common.brewing.BrewingRecipe;
-import net.neoforged.neoforge.common.brewing.IBrewingRecipe;
 import moze_intel.projecte.compat.fluids.FluidType;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
+import moze_intel.projecte.compat.fml.ServerLifecycleHooks;
 import org.jetbrains.annotations.Nullable;
 
 @EMCMapper
@@ -77,40 +75,11 @@ public class BrewingMapper implements IEMCMapper<NormalizedSimpleStack, Long> {
 			}
 		}
 
-		Set<Class<?>> canNotMap = new HashSet<>();
-		for (IBrewingRecipe recipe : potionBrewing.getRecipes()) {
-			if (recipe instanceof BrewingRecipe brewingRecipe) {
-				ItemStack[] validInputs = getMatchingStacks(brewingRecipe.getInput());
-				ItemStack[] validReagents = getMatchingStacks(brewingRecipe.getIngredient());
-				if (validInputs == null || validReagents == null) {
-					//Skip brewing recipes that we are not able to process such as ones using tags
-					// as ingredients, as tags don't exist when the brewing recipe is being defined
-					continue;
-				}
-				ItemStack output = brewingRecipe.getOutput();
-				NormalizedSimpleStack nssOut = NSSItem.createItem(output);
-				for (ItemStack validInput : validInputs) {
-					NormalizedSimpleStack nssInput = NSSItem.createItem(validInput);
-					for (ItemStack validReagent : validReagents) {
-						//Add the conversion, 3 input + x reagent = 3 y output as strictly speaking the only one of the three parts
-						// in the recipe that are required to be one in stack size is the input
-						mapper.addConversion(3 * output.getCount(), nssOut, EMCHelper.intMapOf(
-								nssInput, 3,
-								NSSItem.createItem(validReagent), validReagent.getCount()
-						));
-						recipeCount++;
-					}
-				}
-			} else {
-				canNotMap.add(recipe.getClass());
-			}
-		}
+		//Fabric port: NeoForge's custom brewing recipe API (IBrewingRecipe/PotionBrewing#getRecipes) has no Fabric
+		// equivalent, so only the vanilla mix based recipes handled above get mapped
 
 		PECore.debugLog("{} Statistics:", getName());
 		PECore.debugLog("Found {} Brewing Recipes", recipeCount);
-		for (Class<?> c : canNotMap) {
-			PECore.debugLog("Could not map Brewing Recipes with Type: {}", c.getName());
-		}
 	}
 
 	@Override

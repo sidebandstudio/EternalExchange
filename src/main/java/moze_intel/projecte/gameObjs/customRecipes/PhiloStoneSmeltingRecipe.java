@@ -20,7 +20,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
+import moze_intel.projecte.compat.fml.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 
 public class PhiloStoneSmeltingRecipe extends CustomRecipe {

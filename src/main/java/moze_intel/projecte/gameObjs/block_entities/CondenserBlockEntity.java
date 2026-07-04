@@ -1,6 +1,7 @@
 package moze_intel.projecte.gameObjs.block_entities;
 
 import com.mojang.serialization.DataResult;
+import java.util.function.BiFunction;
 import moze_intel.projecte.api.ItemInfo;
 import moze_intel.projecte.api.event.PlayerAttemptCondenserSetEvent;
 import moze_intel.projecte.api.proxy.IEMCProxy;
@@ -24,17 +25,15 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.ICapabilityProvider;
-import net.neoforged.neoforge.common.NeoForge;
 import moze_intel.projecte.compat.items.IItemHandler;
 import moze_intel.projecte.compat.items.ItemHandlerHelper;
 import moze_intel.projecte.compat.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CondenserBlockEntity extends EmcChestBlockEntity {
+public class CondenserBlockEntity extends EmcChestBlockEntity implements IItemHandlerBlockEntity {
 
-	public static final ICapabilityProvider<CondenserBlockEntity, @Nullable Direction, IItemHandler> INVENTORY_PROVIDER = (condenser, side) -> condenser.automationInventory;
+	public static final BiFunction<CondenserBlockEntity, @Nullable Direction, IItemHandler> INVENTORY_PROVIDER = (condenser, side) -> condenser.automationInventory;
 
 	protected final ItemStackHandler inputInventory = createInput();
 	private final ItemStackHandler outputInventory = createOutput();
@@ -83,6 +82,12 @@ public class CondenserBlockEntity extends EmcChestBlockEntity {
 
 	public ItemStackHandler getOutput() {
 		return outputInventory;
+	}
+
+	//Fabric port: allows our blocks to query the inventory NeoForge exposed via the item handler block capability
+	@Override
+	public IItemHandler getItemHandler(@Nullable Direction side) {
+		return INVENTORY_PROVIDER.apply(this, side);
 	}
 
 	protected ItemStackHandler createInput() {
@@ -203,7 +208,10 @@ public class CondenserBlockEntity extends EmcChestBlockEntity {
 			if (!stack.isEmpty()) {
 				ItemInfo sourceInfo = ItemInfo.fromStack(stack);
 				ItemInfo reducedInfo = IEMCProxy.INSTANCE.getPersistentInfo(sourceInfo);
-				if (!NeoForge.EVENT_BUS.post(new PlayerAttemptCondenserSetEvent(player, sourceInfo, reducedInfo)).isCanceled()) {
+				//Fabric port: fire via the event's Fabric callback instead of the NeoForge event bus
+				PlayerAttemptCondenserSetEvent event = new PlayerAttemptCondenserSetEvent(player, sourceInfo, reducedInfo);
+				PlayerAttemptCondenserSetEvent.EVENT.invoker().onAttemptCondenserSet(event);
+				if (!event.isCanceled()) {
 					lockInfo = reducedInfo;
 					checkLockAndUpdate(true);
 					markDirty(level, pos, false);

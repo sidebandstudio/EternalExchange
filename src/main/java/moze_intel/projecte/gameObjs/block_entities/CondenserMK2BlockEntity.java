@@ -18,7 +18,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import moze_intel.projecte.compat.items.IItemHandler;
 import moze_intel.projecte.compat.items.IItemHandlerModifiable;
 import moze_intel.projecte.compat.items.ItemStackHandler;
-import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
 import org.jetbrains.annotations.NotNull;
 
 public class CondenserMK2BlockEntity extends CondenserBlockEntity {

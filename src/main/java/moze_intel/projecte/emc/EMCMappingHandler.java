@@ -39,8 +39,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ReloadableServerResources;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
+import moze_intel.projecte.compat.fml.ServerLifecycleHooks;
 import org.apache.commons.math3.fraction.BigFraction;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -142,7 +141,8 @@ public final class EMCMappingHandler {
 				}
 			}
 		}
-		NeoForge.EVENT_BUS.post(new EMCRemapEvent());
+		//Fabric port: fire the remap event on the Fabric event instead of the NeoForge event bus
+		EMCRemapEvent.EVENT.invoker().onEmcRemap(new EMCRemapEvent());
 	}
 
 	public static int getLoadIndex() {

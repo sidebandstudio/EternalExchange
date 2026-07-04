@@ -1,5 +1,6 @@
 package moze_intel.projecte.gameObjs.block_entities;
 
+import java.util.function.BiFunction;
 import moze_intel.projecte.api.block_entity.IRelay;
 import moze_intel.projecte.api.capabilities.PECapabilities;
 import moze_intel.projecte.api.capabilities.item.IItemEmcHolder;
@@ -28,20 +29,17 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.ICapabilityProvider;
 import moze_intel.projecte.compat.items.IItemHandler;
 import moze_intel.projecte.compat.items.IItemHandlerModifiable;
 import moze_intel.projecte.compat.items.ItemHandlerHelper;
 import moze_intel.projecte.compat.items.ItemStackHandler;
-import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
-import net.neoforged.neoforge.items.wrapper.RangedWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
-public class CollectorMK1BlockEntity extends EmcBlockEntity implements MenuProvider {
+public class CollectorMK1BlockEntity extends EmcBlockEntity implements MenuProvider, IItemHandlerBlockEntity {
 
-	public static final ICapabilityProvider<CollectorMK1BlockEntity, @Nullable Direction, IItemHandler> INVENTORY_PROVIDER = (collector, side) -> {
+	public static final BiFunction<CollectorMK1BlockEntity, @Nullable Direction, IItemHandler> INVENTORY_PROVIDER = (collector, side) -> {
 		if (side == null) {
 			return collector.joined;
 		} else if (side.getAxis().isVertical()) {
@@ -119,6 +117,12 @@ public class CollectorMK1BlockEntity extends EmcBlockEntity implements MenuProvi
 
 	public IItemHandler getAux() {
 		return auxSlots;
+	}
+
+	//Fabric port: allows our blocks to query the inventory NeoForge exposed via the item handler block capability
+	@Override
+	public IItemHandler getItemHandler(@Nullable Direction side) {
+		return INVENTORY_PROVIDER.apply(this, side);
 	}
 
 	protected int getInvSize() {

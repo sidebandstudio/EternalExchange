@@ -1,5 +1,6 @@
 package moze_intel.projecte.gameObjs.block_entities;
 
+import java.util.function.BiFunction;
 import moze_intel.projecte.api.capabilities.PECapabilities;
 import moze_intel.projecte.api.capabilities.item.IAlchChestItem;
 import moze_intel.projecte.gameObjs.container.AlchChestContainer;
@@ -18,14 +19,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.ICapabilityProvider;
 import moze_intel.projecte.compat.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class AlchBlockEntityChest extends EmcChestBlockEntity {
+public class AlchBlockEntityChest extends EmcChestBlockEntity implements IItemHandlerBlockEntity {
 
-	public static final ICapabilityProvider<AlchBlockEntityChest, @Nullable Direction, IItemHandler> INVENTORY_PROVIDER = (chest, side) -> chest.inventory;
+	public static final BiFunction<AlchBlockEntityChest, @Nullable Direction, IItemHandler> INVENTORY_PROVIDER = (chest, side) -> chest.inventory;
 
 	private final StackHandler inventory = new StackHandler(104) {
 		@Override
@@ -84,6 +84,12 @@ public class AlchBlockEntityChest extends EmcChestBlockEntity {
 
 	public IItemHandler getInventory() {
 		return inventory;
+	}
+
+	//Fabric port: allows our blocks to query the inventory NeoForge exposed via the item handler block capability
+	@Override
+	public IItemHandler getItemHandler(@Nullable Direction side) {
+		return INVENTORY_PROVIDER.apply(this, side);
 	}
 
 	@NotNull
