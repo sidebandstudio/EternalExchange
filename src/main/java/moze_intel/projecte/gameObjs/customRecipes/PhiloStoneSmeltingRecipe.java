@@ -59,7 +59,7 @@ public class PhiloStoneSmeltingRecipe extends CustomRecipe {
 					//Exit if we have more than 9 items total (for mods that may add larger crafting tables)
 					return Collections.emptySet();
 				}
-				if (stack.is(PEItems.PHILOSOPHERS_STONE)) {
+				if (stack.is(PEItems.PHILOSOPHERS_STONE.get())) {
 					philoStones.add(stack);
 				}
 				if (stack.is(ItemTags.COALS)) {

@@ -84,8 +84,8 @@ public class InternalAbilities {
 		if (player.isCreative() || player.isSpectator()) {
 			return;
 		}
-		boolean shouldFly = shouldPlayerFly(player) || player.getOffhandItem().is(PEItems.ARCANA_RING)
-							|| (player.getOffhandItem().is(PEItems.SWIFTWOLF_RENDING_GALE) && ItemPE.hasEmc(player, player.getOffhandItem(), 64, true));
+		boolean shouldFly = shouldPlayerFly(player) || player.getOffhandItem().is(PEItems.ARCANA_RING.get())
+							|| (player.getOffhandItem().is(PEItems.SWIFTWOLF_RENDING_GALE.get()) && ItemPE.hasEmc(player, player.getOffhandItem(), 64, true));
 		Abilities abilities = player.getAbilities();
 		if (shouldFly != abilities.mayfly) {
 			abilities.mayfly = shouldFly;
@@ -97,26 +97,26 @@ public class InternalAbilities {
 	}
 
 	private static boolean shouldPlayerFly(Player player) {
-		return PlayerHelper.checkHotbarCurios(player, (p, stack) -> stack.is(PEItems.SWIFTWOLF_RENDING_GALE) && ItemPE.hasEmc(p, stack, 64, true))
+		return PlayerHelper.checkHotbarCurios(player, (p, stack) -> stack.is(PEItems.SWIFTWOLF_RENDING_GALE.get()) && ItemPE.hasEmc(p, stack, 64, true))
 			   //Note: Curios, and the offhand are handled by the attribute on the arcana ring. We want it to provide flight in other slots on the hotbar as well
 			   // so we have to do it here. We do this rather than only doing a hotbar curios check with no attribute, so that the tooltip shows it provides flight
-			   || PlayerHelper.checkHotbar(player, (p, stack) -> stack.is(PEItems.ARCANA_RING));
+			   || PlayerHelper.checkHotbar(player, (p, stack) -> stack.is(PEItems.ARCANA_RING.get()));
 	}
 
 	private static WalkOnType canWalkOnWater(Player player) {
-		if (PlayerHelper.checkHotbarCurios(player, (p, stack) -> stack.is(PEItems.EVERTIDE_AMULET))) {
+		if (PlayerHelper.checkHotbarCurios(player, (p, stack) -> stack.is(PEItems.EVERTIDE_AMULET.get()))) {
 			return WalkOnType.ABLE_WITH_SPEED;
 		}
 		ItemStack helmet = player.getItemBySlot(EquipmentSlot.HEAD);
-		return !helmet.isEmpty() && helmet.is(PEItems.GEM_HELMET) ? WalkOnType.ABLE : WalkOnType.UNABLE;
+		return !helmet.isEmpty() && helmet.is(PEItems.GEM_HELMET.get()) ? WalkOnType.ABLE : WalkOnType.UNABLE;
 	}
 
 	private static WalkOnType canWalkOnLava(Player player) {
-		if (PlayerHelper.checkHotbarCurios(player, (p, stack) -> stack.is(PEItems.VOLCANITE_AMULET))) {
+		if (PlayerHelper.checkHotbarCurios(player, (p, stack) -> stack.is(PEItems.VOLCANITE_AMULET.get()))) {
 			return WalkOnType.ABLE_WITH_SPEED;
 		}
 		ItemStack chestplate = player.getItemBySlot(EquipmentSlot.CHEST);
-		return !chestplate.isEmpty() && chestplate.is(PEItems.GEM_CHESTPLATE) ? WalkOnType.ABLE : WalkOnType.UNABLE;
+		return !chestplate.isEmpty() && chestplate.is(PEItems.GEM_CHESTPLATE.get()) ? WalkOnType.ABLE : WalkOnType.UNABLE;
 	}
 
 	private enum WalkOnType {

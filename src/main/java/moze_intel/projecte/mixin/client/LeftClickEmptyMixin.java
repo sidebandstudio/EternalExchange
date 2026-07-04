@@ -27,7 +27,7 @@ public class LeftClickEmptyMixin {
 	 */
 	@Inject(method = "startAttack", at = @At("HEAD"))
 	private void projecte$leftClickEmpty(CallbackInfoReturnable<Boolean> cir) {
-		if (player != null && hitResult != null && hitResult.getType() == HitResult.Type.MISS && player.getMainHandItem().is(PEItems.ARCHANGEL_SMITE)) {
+		if (player != null && hitResult != null && hitResult.getType() == HitResult.Type.MISS && player.getMainHandItem().is(PEItems.ARCHANGEL_SMITE.get())) {
 			PECore.packetHandler().activateArchangel();
 		}
 	}

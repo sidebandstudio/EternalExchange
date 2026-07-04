@@ -34,7 +34,7 @@ public record UpdateGemModePKT(InteractionHand hand, boolean mode) implements IP
 	public void handle(IPayloadContext context) {
 		ItemStack stack = context.player().getItemInHand(hand);
 		if (!stack.isEmpty()) {
-			if (stack.is(PEItems.GEM_OF_ETERNAL_DENSITY) || stack.is(PEItems.VOID_RING)) {
+			if (stack.is(PEItems.GEM_OF_ETERNAL_DENSITY.get()) || stack.is(PEItems.VOID_RING.get())) {
 				stack.update(PEDataComponentTypes.GEM_DATA.get(), GemData.EMPTY, mode, GemData::withWhitelist);
 			}
 		}

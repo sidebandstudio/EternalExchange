@@ -40,16 +40,16 @@ public abstract class GemArmorBase extends PEArmor {
 	}
 
 	public static boolean hasAnyPiece(Player player) {
-		return player.getItemBySlot(EquipmentSlot.HEAD).is(PEItems.GEM_HELMET) ||
-			   player.getItemBySlot(EquipmentSlot.CHEST).is(PEItems.GEM_CHESTPLATE) ||
-			   player.getItemBySlot(EquipmentSlot.LEGS).is(PEItems.GEM_LEGGINGS) ||
-			   player.getItemBySlot(EquipmentSlot.FEET).is(PEItems.GEM_BOOTS);
+		return player.getItemBySlot(EquipmentSlot.HEAD).is(PEItems.GEM_HELMET.get()) ||
+			   player.getItemBySlot(EquipmentSlot.CHEST).is(PEItems.GEM_CHESTPLATE.get()) ||
+			   player.getItemBySlot(EquipmentSlot.LEGS).is(PEItems.GEM_LEGGINGS.get()) ||
+			   player.getItemBySlot(EquipmentSlot.FEET).is(PEItems.GEM_BOOTS.get());
 	}
 
 	public static boolean hasFullSet(Player player) {
-		return player.getItemBySlot(EquipmentSlot.HEAD).is(PEItems.GEM_HELMET) &&
-			   player.getItemBySlot(EquipmentSlot.CHEST).is(PEItems.GEM_CHESTPLATE) &&
-			   player.getItemBySlot(EquipmentSlot.LEGS).is(PEItems.GEM_LEGGINGS) &&
-			   player.getItemBySlot(EquipmentSlot.FEET).is(PEItems.GEM_BOOTS);
+		return player.getItemBySlot(EquipmentSlot.HEAD).is(PEItems.GEM_HELMET.get()) &&
+			   player.getItemBySlot(EquipmentSlot.CHEST).is(PEItems.GEM_CHESTPLATE.get()) &&
+			   player.getItemBySlot(EquipmentSlot.LEGS).is(PEItems.GEM_LEGGINGS.get()) &&
+			   player.getItemBySlot(EquipmentSlot.FEET).is(PEItems.GEM_BOOTS.get());
 	}
 }

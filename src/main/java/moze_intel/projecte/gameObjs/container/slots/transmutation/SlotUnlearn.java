@@ -18,7 +18,7 @@ public class SlotUnlearn extends InventoryContainerSlot {
 
 	@Override
 	public boolean mayPlace(@NotNull ItemStack stack) {
-		return !this.hasItem() && (IEMCProxy.INSTANCE.hasValue(stack) || stack.is(PEItems.TOME_OF_KNOWLEDGE));
+		return !this.hasItem() && (IEMCProxy.INSTANCE.hasValue(stack) || stack.is(PEItems.TOME_OF_KNOWLEDGE.get()));
 	}
 
 	@Override

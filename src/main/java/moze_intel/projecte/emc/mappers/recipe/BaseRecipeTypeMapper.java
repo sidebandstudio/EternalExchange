@@ -211,8 +211,8 @@ public abstract class BaseRecipeTypeMapper implements IRecipeTypeMapper {
 	}
 
 	private static boolean isPECatalyst(ItemStack stack) {
-		return stack.is(PEItems.PHILOSOPHERS_STONE) || stack.is(PEItems.EVERTIDE_AMULET) || stack.is(PEItems.VOLCANITE_AMULET) ||
-			   stack.is(PEItems.ARCANA_RING) || stack.is(PEItems.ZERO_RING);
+		return stack.is(PEItems.PHILOSOPHERS_STONE.get()) || stack.is(PEItems.EVERTIDE_AMULET.get()) || stack.is(PEItems.VOLCANITE_AMULET.get()) ||
+			   stack.is(PEItems.ARCANA_RING.get()) || stack.is(PEItems.ZERO_RING.get());
 	}
 
 	@Nullable

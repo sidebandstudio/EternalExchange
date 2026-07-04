@@ -11,7 +11,7 @@ import net.minecraft.world.entity.player.Player;
 public class PlayerRender {
 
 	public static float adjustFovModifier(Player player, float fovModifier) {
-		if (!player.getItemBySlot(EquipmentSlot.FEET).isEmpty() && player.getItemBySlot(EquipmentSlot.FEET).is(PEItems.GEM_BOOTS)) {
+		if (!player.getItemBySlot(EquipmentSlot.FEET).isEmpty() && player.getItemBySlot(EquipmentSlot.FEET).is(PEItems.GEM_BOOTS.get())) {
 			return fovModifier - 0.5F * Minecraft.getInstance().options.fovEffectScale().get().floatValue();
 		}
 		return fovModifier;

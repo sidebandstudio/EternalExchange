@@ -48,13 +48,13 @@ public record KeyPressPKT(PEKeybind key) implements IPEPacket {
 		}
 		if (key == PEKeybind.HELMET_TOGGLE) {
 			ItemStack helm = player.getItemBySlot(EquipmentSlot.HEAD);
-			if (!helm.isEmpty() && helm.is(PEItems.GEM_HELMET)) {
+			if (!helm.isEmpty() && helm.is(PEItems.GEM_HELMET.get())) {
 				GemHelmet.toggleNightVision(helm, player);
 			}
 			return;
 		} else if (key == PEKeybind.BOOTS_TOGGLE) {
 			ItemStack boots = player.getItemBySlot(EquipmentSlot.FEET);
-			if (!boots.isEmpty() && boots.is(PEItems.GEM_BOOTS)) {
+			if (!boots.isEmpty() && boots.is(PEItems.GEM_BOOTS.get())) {
 				GemFeet.toggleStepAssist(boots, player);
 			}
 			return;
@@ -77,7 +77,7 @@ public record KeyPressPKT(PEKeybind key) implements IPEPacket {
 						return;
 					} else if (hand == InteractionHand.MAIN_HAND && isSafe(stack) && moze_intel.projecte.compat.attachments.PEAttachments.getData(player, PEAttachmentTypes.GEM_ARMOR_STATE)) {
 						ItemStack chestplate = player.getItemBySlot(EquipmentSlot.CHEST);
-						if (!chestplate.isEmpty() && chestplate.is(PEItems.GEM_CHESTPLATE) &&
+						if (!chestplate.isEmpty() && chestplate.is(PEItems.GEM_CHESTPLATE.get()) &&
 							PlayerHelper.checkCooldown(player, PEItems.GEM_CHESTPLATE.get(), ProjectEConfig.server.cooldown.player.gemChest)) {
 							GemChest.doExplode(player);
 							return;
@@ -91,7 +91,7 @@ public record KeyPressPKT(PEKeybind key) implements IPEPacket {
 					}
 					if (hand == InteractionHand.MAIN_HAND && isSafe(stack) && moze_intel.projecte.compat.attachments.PEAttachments.getData(player, PEAttachmentTypes.GEM_ARMOR_STATE)) {
 						ItemStack helmet = player.getItemBySlot(EquipmentSlot.HEAD);
-						if (!helmet.isEmpty() && helmet.is(PEItems.GEM_HELMET)) {
+						if (!helmet.isEmpty() && helmet.is(PEItems.GEM_HELMET.get())) {
 							GemHelmet.doZap(player);
 							return;
 						}

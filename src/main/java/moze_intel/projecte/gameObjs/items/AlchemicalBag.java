@@ -58,7 +58,7 @@ public class AlchemicalBag extends ItemPE {
 				IItemHandler inv = alchBagProvider.getBag(bag.color);
 				for (int i = 0; i < inv.getSlots(); i++) {
 					ItemStack ring = inv.getStackInSlot(i);
-					if (!ring.isEmpty() && (ring.is(PEItems.BLACK_HOLE_BAND) || ring.is(PEItems.VOID_RING))) {
+					if (!ring.isEmpty() && (ring.is(PEItems.BLACK_HOLE_BAND.get()) || ring.is(PEItems.VOID_RING.get()))) {
 						if (ring.getOrDefault(PEDataComponentTypes.ACTIVE.get(), false)) {
 							return stack;
 						}

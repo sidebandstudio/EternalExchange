@@ -86,7 +86,7 @@ public final class PacketHandler {
 		activateArchangel = registrar.playInstanced(PECore.rl("activate_archangel"), (ignored, context) -> {
 			Player player = context.player();
 			ItemStack main = player.getMainHandItem();
-			if (!main.isEmpty() && main.is(PEItems.ARCHANGEL_SMITE)) {
+			if (!main.isEmpty() && main.is(PEItems.ARCHANGEL_SMITE.get())) {
 				ArchangelSmite.fireVolley(main, player);
 			}
 		});

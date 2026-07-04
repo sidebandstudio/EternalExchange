@@ -33,6 +33,6 @@ public class SlotConsume extends InventoryContainerSlot {
 
 	@Override
 	public boolean mayPlace(@NotNull ItemStack stack) {
-		return IEMCProxy.INSTANCE.hasValue(stack) || stack.is(PEItems.TOME_OF_KNOWLEDGE);
+		return IEMCProxy.INSTANCE.hasValue(stack) || stack.is(PEItems.TOME_OF_KNOWLEDGE.get());
 	}
 }

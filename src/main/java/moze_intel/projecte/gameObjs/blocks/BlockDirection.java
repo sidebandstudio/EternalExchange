@@ -54,7 +54,7 @@ public abstract class BlockDirection extends Block {
 	public void attack(@NotNull BlockState state, Level level, @NotNull BlockPos pos, @NotNull Player player) {
 		if (!level.isClientSide) {
 			ItemStack stack = player.getMainHandItem();
-			if (!stack.isEmpty() && stack.is(PEItems.PHILOSOPHERS_STONE)) {
+			if (!stack.isEmpty() && stack.is(PEItems.PHILOSOPHERS_STONE.get())) {
 				level.setBlockAndUpdate(pos, level.getBlockState(pos).setValue(FACING, player.getDirection().getOpposite()));
 			}
 		}
