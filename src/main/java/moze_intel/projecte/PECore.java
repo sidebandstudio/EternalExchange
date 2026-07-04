@@ -158,6 +158,22 @@ public class PECore implements ModInitializer {
 		//Commands
 		CommandRegistrationCallback.EVENT.register((dispatcher, context, environment) -> registerCommands(dispatcher, context));
 
+		//Fabric port: replaces NeoForge's LeftClickBlock/onLeftClickEntity hooks for the Archangel Smite volley
+		net.fabricmc.fabric.api.event.player.AttackBlockCallback.EVENT.register((player, level, hand, pos, direction) -> {
+			ItemStack held = player.getItemInHand(hand);
+			if (!level.isClientSide && !held.isEmpty() && held.getItem() instanceof moze_intel.projecte.gameObjs.items.rings.ArchangelSmite smite) {
+				smite.leftClickBlock(player, held);
+			}
+			return net.minecraft.world.InteractionResult.PASS;
+		});
+		net.fabricmc.fabric.api.event.player.AttackEntityCallback.EVENT.register((player, level, hand, entity, hitResult) -> {
+			ItemStack held = player.getItemInHand(hand);
+			if (!held.isEmpty() && held.getItem() instanceof moze_intel.projecte.gameObjs.items.rings.ArchangelSmite smite) {
+				smite.onLeftClickEntity(held, player, entity);
+			}
+			return net.minecraft.world.InteractionResult.PASS;
+		});
+
 		//Fabric port: replaces NeoForge's onItemUseFirst hook for the philosopher's stone (must run before block interactions)
 		net.fabricmc.fabric.api.event.player.UseBlockCallback.EVENT.register((player, level, hand, hitResult) -> {
 			ItemStack stack = player.getItemInHand(hand);

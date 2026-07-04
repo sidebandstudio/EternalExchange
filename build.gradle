@@ -38,6 +38,14 @@ loom {
 			ideConfigGenerated true
 			runDir "run/server"
 		}
+		// Auto-joins the PortTest world; used for scripted in-game smoke tests
+		clientAuto {
+			inherit client
+			client()
+			programArgs "--quickPlaySingleplayer", "PortTest"
+			ideConfigGenerated false
+			runDir "run"
+		}
 	}
 }
 

@@ -5,13 +5,16 @@
 	"minVersion": "0.8",
 	"mixins": [
 		"ItemEntityPickupMixin",
+		"LivingEntityJumpMixin",
 		"PlayerAttachmentsMixin",
 		"PlayerDamageMixin",
 		"PlayerInvulnerabilityMixin",
+		"PlayerSweepAttackMixin",
 		"PlayerTickMixin"
 	],
 	"client": [
-		"client.FovModifierMixin"
+		"client.FovModifierMixin",
+		"client.LeftClickEmptyMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
