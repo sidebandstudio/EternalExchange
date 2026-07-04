@@ -1,7 +1,10 @@
 package moze_intel.projecte.compat.fluids;
 
 import java.util.Objects;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.core.Holder;
+import net.minecraft.network.chat.Component;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
@@ -55,6 +58,10 @@ public final class FluidStack {
 	@NotNull
 	public DataComponentPatch getComponentsPatch() {
 		return components;
+	}
+
+	public Component getHoverName() {
+		return FluidVariantAttributes.getName(FluidVariant.of(fluid, components));
 	}
 
 	public FluidStack copyWithAmount(int amount) {
