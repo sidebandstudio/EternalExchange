@@ -30,8 +30,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.LevelResource;
-import net.neoforged.fml.util.thread.EffectiveSide;
-import net.neoforged.neoforge.attachment.AttachmentHolder;
+import moze_intel.projecte.compat.attachments.PEAttachments;
+import moze_intel.projecte.compat.fml.EffectiveSide;
 import moze_intel.projecte.compat.items.IItemHandler;
 import moze_intel.projecte.compat.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.NotNull;
@@ -61,15 +61,17 @@ public class TransmutationOffline {
 	}
 
 	private static boolean cacheOfflineData(MinecraftServer server, UUID playerUUID) {
-		if (EffectiveSide.get().isClient()) {
+		if (EffectiveSide.isClient()) {
 			throw new IllegalStateException("CRITICAL: Trying to read filesystem on client!!");
 		}
 		Path player = server.getWorldPath(LevelResource.PLAYER_DATA_DIR).resolve(playerUUID.toString() + ".dat");
 		if (Files.exists(player) && Files.isRegularFile(player)) {
 			try (InputStream in = Files.newInputStream(player)) {
 				CompoundTag playerDat = NbtIo.readCompressed(in, NbtAccounter.unlimitedHeap()); // No need to create buffered stream, that call does it for us
-				if (playerDat.contains(AttachmentHolder.ATTACHMENTS_NBT_KEY, Tag.TAG_COMPOUND)) {
-					CompoundTag attachmentData = playerDat.getCompound(AttachmentHolder.ATTACHMENTS_NBT_KEY);
+				//Fabric port: prefer this port's attachment tag, fall back to data written by the NeoForge version
+				String attachmentsKey = playerDat.contains(PEAttachments.SAVED_DATA_KEY, Tag.TAG_COMPOUND) ? PEAttachments.SAVED_DATA_KEY : PEAttachments.NEOFORGE_SAVED_DATA_KEY;
+				if (playerDat.contains(attachmentsKey, Tag.TAG_COMPOUND)) {
+					CompoundTag attachmentData = playerDat.getCompound(attachmentsKey);
 					CompoundTag knowledgeData = attachmentData.getCompound(PEAttachmentTypes.KNOWLEDGE.getId().toString());
 					RegistryOps<Tag> serializationContext = server.registryAccess().createSerializationContext(NbtOps.INSTANCE);
 					DataResult<KnowledgeAttachment> result = KnowledgeAttachment.CODEC.parse(serializationContext, knowledgeData);

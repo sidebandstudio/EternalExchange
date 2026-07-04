@@ -25,7 +25,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.capabilities.ItemCapability;
+import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
 import moze_intel.projecte.compat.network.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
@@ -106,9 +106,9 @@ public record KeyPressPKT(PEKeybind key) implements IPEPacket {
 		}
 	}
 
-	private static <CAPABILITY> boolean tryPerformCapability(Player player, ItemStack stack, InteractionHand hand, ItemCapability<CAPABILITY, Void> capability,
+	private static <CAPABILITY> boolean tryPerformCapability(Player player, ItemStack stack, InteractionHand hand, ItemApiLookup<CAPABILITY, Void> capability,
 			CapabilityProcessor<CAPABILITY> processor) {
-		CAPABILITY impl = stack.getCapability(capability);
+		CAPABILITY impl = capability.find(stack, null);
 		return impl != null && processor.process(impl, player, stack, hand);
 	}
 

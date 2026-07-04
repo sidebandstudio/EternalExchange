@@ -35,10 +35,15 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.fml.loading.FMLEnvironment;
-import net.neoforged.neoforge.common.Tags;
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
+import net.fabricmc.loader.api.FabricLoader;
 
 public class DumpMissingEmc {
+
+	//Fabric port: c: storage block tags for raw materials (no ConventionalItemTags constants for these)
+	private static final net.minecraft.tags.TagKey<net.minecraft.world.item.Item> RAW_COPPER_BLOCKS = net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("c", "storage_blocks/raw_copper"));
+	private static final net.minecraft.tags.TagKey<net.minecraft.world.item.Item> RAW_IRON_BLOCKS = net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("c", "storage_blocks/raw_iron"));
+	private static final net.minecraft.tags.TagKey<net.minecraft.world.item.Item> RAW_GOLD_BLOCKS = net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("c", "storage_blocks/raw_gold"));
 
 	private static final boolean SKIP_TOP = Boolean.parseBoolean(System.getProperties().getProperty("projecte.skip_top"));
 
@@ -62,19 +67,19 @@ public class DumpMissingEmc {
 			default -> false;
 		}) {
 			return true;
-		} else if (!FMLEnvironment.production && SKIP_TOP &&
+		} else if (FabricLoader.getInstance().isDevelopmentEnvironment() && SKIP_TOP &&
 				   holder.unwrapKey().map(key -> key.location().getNamespace().equals(IntegrationHelper.TOP_MODID)).orElse(false)) {
 			//Skip TOP items in dev
 			return true;
 		}
 		if (MappingConfig.isEnabled(OreBlacklistMapper.INSTANCE)) {
-			if (holder.is(Tags.Items.ORES) || holder.value() == Items.GILDED_BLACKSTONE) {
+			if (holder.is(ConventionalItemTags.ORES) || holder.value() == Items.GILDED_BLACKSTONE) {
 				return true;
 			}
 		}
 		if (MappingConfig.isEnabled(RawMaterialsBlacklistMapper.INSTANCE)) {
-			if (holder.is(Tags.Items.RAW_MATERIALS) || holder.is(Tags.Items.STORAGE_BLOCKS_RAW_COPPER) ||
-				holder.is(Tags.Items.STORAGE_BLOCKS_RAW_IRON) || holder.is(Tags.Items.STORAGE_BLOCKS_RAW_GOLD)) {
+			if (holder.is(ConventionalItemTags.RAW_MATERIALS) || holder.is(RAW_COPPER_BLOCKS) ||
+				holder.is(RAW_IRON_BLOCKS) || holder.is(RAW_GOLD_BLOCKS)) {
 				return true;
 			}
 		}
@@ -86,7 +91,7 @@ public class DumpMissingEmc {
 		CommandSourceStack source = ctx.getSource();
 		RegistryAccess registryAccess = source.registryAccess();
 		Minecraft minecraft = Minecraft.getInstance();
-		//TODO - 1.21.4: Make use of https://github.com/neoforged/NeoForge/pull/1928
+		//TODO - 1.21.4: upstream plans to use a data map for this (NeoForge PR 1928)
 		FeatureFlagSet features = minecraft.getConnection() == null ? FeatureFlags.DEFAULT_FLAGS : minecraft.getConnection().enabledFeatures();
 		CreativeModeTab tab = registryAccess.holderOrThrow(CreativeModeTabs.SEARCH).value();
 		if (tab.getSearchTabDisplayItems().isEmpty()) {

@@ -20,8 +20,6 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.BlockEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class EntityWaterProjectile extends NoGravityThrowableProjectile {
@@ -55,11 +53,8 @@ public class EntityWaterProjectile extends NoGravityThrowableProjectile {
 						if (state.getBlock() instanceof LiquidBlock) {
 							//If it is a source block convert it
 							Block block = fluidState.isSource() ? Blocks.OBSIDIAN : Blocks.COBBLESTONE;
-							//Like: ForgeEventFactory#fireFluidPlaceBlockEvent except checks if it was cancelled
-							BlockEvent.FluidPlaceBlockEvent event = new BlockEvent.FluidPlaceBlockEvent(level, pos, pos, block.defaultBlockState());
-							if (!NeoForge.EVENT_BUS.post(event).isCanceled()) {
-								PlayerHelper.checkedPlaceBlock(player, level, pos, event.getNewState());
-							}
+							//Fabric port: no fluid-place-block event to consult
+							PlayerHelper.checkedPlaceBlock(player, level, pos, block.defaultBlockState());
 						} else {
 							//Otherwise if it is lava logged, "void" the lava as we can't place a block in that spot
 							WorldHelper.drainFluid(player, level, pos, state);

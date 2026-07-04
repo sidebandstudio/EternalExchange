@@ -37,7 +37,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import moze_intel.projecte.compat.attachments.IAttachmentHolder;
-import net.neoforged.neoforge.common.NeoForge;
 import moze_intel.projecte.compat.items.IItemHandlerModifiable;
 import moze_intel.projecte.compat.items.ItemStackHandler;
 import moze_intel.projecte.compat.network.PacketDistributor;
@@ -69,7 +68,7 @@ public class KnowledgeImpl implements IKnowledgeProvider {
 
 	protected void fireChangedEvent() {
 		if (player != null && !player.level().isClientSide) {
-			NeoForge.EVENT_BUS.post(new PlayerKnowledgeChangeEvent(player));
+			PlayerKnowledgeChangeEvent.EVENT.invoker().onKnowledgeChange(new PlayerKnowledgeChangeEvent(player));
 		}
 	}
 

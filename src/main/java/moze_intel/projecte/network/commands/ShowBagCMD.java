@@ -43,9 +43,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.storage.LevelResource;
-import net.neoforged.neoforge.attachment.AttachmentHolder;
+import moze_intel.projecte.compat.attachments.PEAttachments;
 import moze_intel.projecte.compat.items.IItemHandlerModifiable;
-import net.neoforged.neoforge.server.command.EnumArgument;
 import org.jetbrains.annotations.NotNull;
 
 public class ShowBagCMD {
@@ -55,11 +54,22 @@ public class ShowBagCMD {
 	public static LiteralArgumentBuilder<CommandSourceStack> register(CommandBuildContext context) {
 		return Commands.literal("showbag")
 				.requires(PEPermissions.COMMAND_SHOW_BAG)
-				.then(Commands.argument("color", EnumArgument.enumArgument(DyeColor.class))
+				//Fabric port: NeoForge's EnumArgument replaced with a suggested string argument
+				.then(Commands.argument("color", com.mojang.brigadier.arguments.StringArgumentType.word())
+						.suggests((ctx, builder) -> net.minecraft.commands.SharedSuggestionProvider.suggest(java.util.Arrays.stream(DyeColor.values()).map(DyeColor::getName), builder))
 						.then(Commands.argument("target", EntityArgument.player())
-								.executes(ctx -> showBag(ctx, ctx.getArgument("color", DyeColor.class), EntityArgument.getPlayer(ctx, "target"))))
+								.executes(ctx -> showBag(ctx, getColor(ctx), EntityArgument.getPlayer(ctx, "target"))))
 						.then(Commands.argument("uuid", UuidArgument.uuid())
-								.executes(ctx -> showBag(ctx, ctx.getArgument("color", DyeColor.class), UuidArgument.getUuid(ctx, "uuid")))));
+								.executes(ctx -> showBag(ctx, getColor(ctx), UuidArgument.getUuid(ctx, "uuid")))));
+	}
+
+	private static DyeColor getColor(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+		String name = com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "color");
+		DyeColor color = DyeColor.byName(name, null);
+		if (color == null) {
+			throw NOT_FOUND.create();
+		}
+		return color;
 	}
 
 	private static int showBag(CommandContext<CommandSourceStack> ctx, DyeColor color, ServerPlayer player) throws CommandSyntaxException {
@@ -73,7 +83,7 @@ public class ShowBagCMD {
 	}
 
 	private static int showBag(ServerPlayer senderPlayer, MenuProvider container) {
-		senderPlayer.openMenu(container, b -> {
+		moze_intel.projecte.compat.network.PEMenuHelper.openMenu(senderPlayer, container, b -> {
 			b.writeBoolean(false);
 			b.writeBoolean(false);
 		});
@@ -125,8 +135,10 @@ public class ShowBagCMD {
 		if (Files.exists(player) && Files.isRegularFile(player)) {
 			try (InputStream in = Files.newInputStream(player)) {
 				CompoundTag playerDat = NbtIo.readCompressed(in, NbtAccounter.unlimitedHeap());
-				if (playerDat.contains(AttachmentHolder.ATTACHMENTS_NBT_KEY, Tag.TAG_COMPOUND)) {
-					CompoundTag attachmentData = playerDat.getCompound(AttachmentHolder.ATTACHMENTS_NBT_KEY);
+				//Fabric port: prefer this port's attachment tag, fall back to data written by the NeoForge version
+				String attachmentsKey = playerDat.contains(PEAttachments.SAVED_DATA_KEY, Tag.TAG_COMPOUND) ? PEAttachments.SAVED_DATA_KEY : PEAttachments.NEOFORGE_SAVED_DATA_KEY;
+				if (playerDat.contains(attachmentsKey, Tag.TAG_COMPOUND)) {
+					CompoundTag attachmentData = playerDat.getCompound(attachmentsKey);
 					CompoundTag bagData = attachmentData.getCompound(PEAttachmentTypes.ALCHEMICAL_BAGS.getId().toString());
 					RegistryOps<Tag> serializationContext = server.registryAccess().createSerializationContext(NbtOps.INSTANCE);
 					DataResult<AlchemicalBagAttachment> result = AlchemicalBagAttachment.CODEC.parse(serializationContext, bagData);

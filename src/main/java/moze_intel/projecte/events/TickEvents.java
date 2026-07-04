@@ -15,18 +15,15 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import moze_intel.projecte.compat.items.IItemHandler;
+import moze_intel.projecte.compat.items.wrapper.PlayerInvWrapper;
 
-@EventBusSubscriber(modid = PECore.MODID)
+/**
+ * Fabric port: invoked from PlayerTickMixin at the end of Player#tick (upstream used PlayerTickEvent.Post).
+ */
 public class TickEvents {
 
-	@SubscribeEvent
-	public static void playerTick(PlayerTickEvent.Post event) {
-		Player player = event.getEntity();
+	public static void playerTick(Player player) {
 		IAlchBagProvider provider = PECapabilities.ALCH_BAG_CAPABILITY.find(player, null);
 		if (provider != null) {
 			Set<DyeColor> colorsChanged = EnumSet.noneOf(DyeColor.class);
@@ -70,7 +67,7 @@ public class TickEvents {
 
 	private static Set<DyeColor> getBagColorsPresent(Player player) {
 		Set<DyeColor> bagsPresent = EnumSet.noneOf(DyeColor.class);
-		IItemHandler inv = player.getCapability(ItemHandler.ENTITY);
+		IItemHandler inv = new PlayerInvWrapper(player.getInventory());
 		if (inv != null) {
 			for (int i = 0, slots = inv.getSlots(); i < slots; i++) {
 				ItemStack stack = inv.getStackInSlot(i);

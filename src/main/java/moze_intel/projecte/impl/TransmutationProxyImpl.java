@@ -8,9 +8,10 @@ import moze_intel.projecte.api.proxy.ITransmutationProxy;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.fml.loading.FMLEnvironment;
-import net.neoforged.fml.util.thread.EffectiveSide;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
+import moze_intel.projecte.compat.fml.EffectiveSide;
+import moze_intel.projecte.compat.fml.ServerLifecycleHooks;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
 import org.jetbrains.annotations.NotNull;
 
 public class TransmutationProxyImpl implements ITransmutationProxy {
@@ -18,7 +19,7 @@ public class TransmutationProxyImpl implements ITransmutationProxy {
 	@NotNull
 	@Override
 	public IKnowledgeProvider getKnowledgeProviderFor(@NotNull UUID playerUUID) {
-		if (EffectiveSide.get().isServer()) {
+		if (EffectiveSide.isServer()) {
 			Objects.requireNonNull(playerUUID);
 			MinecraftServer server = Objects.requireNonNull(ServerLifecycleHooks.getCurrentServer(), "Server must be running to query knowledge!");
 			Player player = server.getPlayerList().getPlayer(playerUUID);
@@ -26,7 +27,7 @@ public class TransmutationProxyImpl implements ITransmutationProxy {
 				return PECapabilities.KNOWLEDGE_CAPABILITY.find(Objects.requireNonNull(player, null));
 			}
 			return TransmutationOffline.forPlayer(server, playerUUID);
-		} else if (FMLEnvironment.dist.isClient()) {
+		} else if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
 			Objects.requireNonNull(Minecraft.getInstance().player, "Client player doesn't exist!");
 			return PECapabilities.KNOWLEDGE_CAPABILITY.find(Objects.requireNonNull(Minecraft.getInstance().player, null));
 		}

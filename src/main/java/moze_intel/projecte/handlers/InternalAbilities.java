@@ -16,12 +16,11 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.level.material.FluidState;
-import net.neoforged.neoforge.common.NeoForgeMod;
 
 public class InternalAbilities {
 
-	private static final AttributeModifier FLIGHT = new AttributeModifier(PECore.rl("flight"), 1, Operation.ADD_VALUE);
 	private static final AttributeModifier WATER_SPEED_BOOST = new AttributeModifier(PECore.rl("water_speed_boost"), 0.15, Operation.ADD_VALUE);
 	private static final AttributeModifier LAVA_SPEED_BOOST = new AttributeModifier(PECore.rl("lava_speed_boost"), 0.15, Operation.ADD_VALUE);
 
@@ -56,7 +55,7 @@ public class InternalAbilities {
 		if (!player.level().isClientSide) {
 			updateAttribute(player, Attributes.MOVEMENT_SPEED, WATER_SPEED_BOOST, applyWaterSpeed);
 			updateAttribute(player, Attributes.MOVEMENT_SPEED, LAVA_SPEED_BOOST, applyLavaSpeed);
-			updateAttribute(player, NeoForgeMod.CREATIVE_FLIGHT, FLIGHT, InternalAbilities::shouldPlayerFly);
+			updateFlight(player);
 		}
 	}
 
@@ -74,6 +73,26 @@ public class InternalAbilities {
 				//Shouldn't have the modifier, remove it
 				attributeInstance.removeModifier(modifier.id());
 			}
+		}
+	}
+
+	/**
+	 * Fabric port: there is no creative-flight attribute on Fabric, so flight is managed through the player abilities directly. The offhand is checked here too
+	 * because upstream covered it via an item attribute this port does not have.
+	 */
+	private static void updateFlight(Player player) {
+		if (player.isCreative() || player.isSpectator()) {
+			return;
+		}
+		boolean shouldFly = shouldPlayerFly(player) || player.getOffhandItem().is(PEItems.ARCANA_RING)
+							|| (player.getOffhandItem().is(PEItems.SWIFTWOLF_RENDING_GALE) && ItemPE.hasEmc(player, player.getOffhandItem(), 64, true));
+		Abilities abilities = player.getAbilities();
+		if (shouldFly != abilities.mayfly) {
+			abilities.mayfly = shouldFly;
+			if (!shouldFly && abilities.flying) {
+				abilities.flying = false;
+			}
+			player.onUpdateAbilities();
 		}
 	}
 

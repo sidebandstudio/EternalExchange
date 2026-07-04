@@ -4,9 +4,15 @@
 	"compatibilityLevel": "JAVA_21",
 	"minVersion": "0.8",
 	"mixins": [
-		"PlayerAttachmentsMixin"
+		"ItemEntityPickupMixin",
+		"PlayerAttachmentsMixin",
+		"PlayerDamageMixin",
+		"PlayerInvulnerabilityMixin",
+		"PlayerTickMixin"
 	],
-	"client": [],
+	"client": [
+		"client.FovModifierMixin"
+	],
 	"injectors": {
 		"defaultRequire": 1
 	}

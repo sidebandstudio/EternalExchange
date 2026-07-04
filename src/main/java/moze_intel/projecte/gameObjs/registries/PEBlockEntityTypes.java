@@ -18,7 +18,7 @@ import moze_intel.projecte.gameObjs.block_entities.RelayMK2BlockEntity;
 import moze_intel.projecte.gameObjs.block_entities.RelayMK3BlockEntity;
 import moze_intel.projecte.gameObjs.registration.impl.BlockEntityTypeDeferredRegister;
 import moze_intel.projecte.gameObjs.registration.impl.BlockEntityTypeRegistryObject;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import moze_intel.projecte.compat.items.ItemHandler;
 
 public class PEBlockEntityTypes {
 
