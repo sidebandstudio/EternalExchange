@@ -8,7 +8,6 @@ import moze_intel.projecte.utils.WorldHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
@@ -61,7 +60,8 @@ public class ContainerTypeDeferredRegister extends PEDeferredRegister<MenuType<?
 			throw new UnsupportedOperationException("This method is only supported on the client.");
 		}
 		BlockPos pos = buf.readBlockPos();
-		BE blockEntity = WorldHelper.getBlockEntity(type, Minecraft.getInstance().level, pos);
+		//Fabric port: resolved through ClientPayloadHelper so this class stays loadable on dedicated servers
+		BE blockEntity = WorldHelper.getBlockEntity(type, moze_intel.projecte.network.packets.to_client.ClientPayloadHelper.getClientLevel(), pos);
 		if (blockEntity == null) {
 			throw new IllegalStateException("Client could not locate block entity at " + pos + " for block entity container. "
 											+ "This is likely caused by a mod breaking client side block entity lookup");

@@ -5,7 +5,6 @@ import java.util.UUID;
 import moze_intel.projecte.api.capabilities.IKnowledgeProvider;
 import moze_intel.projecte.api.capabilities.PECapabilities;
 import moze_intel.projecte.api.proxy.ITransmutationProxy;
-import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.player.Player;
 import moze_intel.projecte.compat.fml.EffectiveSide;
@@ -28,8 +27,9 @@ public class TransmutationProxyImpl implements ITransmutationProxy {
 			}
 			return TransmutationOffline.forPlayer(server, playerUUID);
 		} else if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
-			Objects.requireNonNull(Minecraft.getInstance().player, "Client player doesn't exist!");
-			return PECapabilities.KNOWLEDGE_CAPABILITY.find(Objects.requireNonNull(Minecraft.getInstance().player), null);
+			//Fabric port: resolved through ClientPayloadHelper so this class stays loadable on dedicated servers
+			Player player = Objects.requireNonNull(moze_intel.projecte.network.packets.to_client.ClientPayloadHelper.getClientPlayer(), "Client player doesn't exist!");
+			return PECapabilities.KNOWLEDGE_CAPABILITY.find(player, null);
 		}
 		throw new IllegalStateException("unreachable");
 	}

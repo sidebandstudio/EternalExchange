@@ -12,7 +12,6 @@ import moze_intel.projecte.utils.text.PELang;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
@@ -83,10 +82,9 @@ public class GemFeet extends GemArmorBase {
 	}
 
 	private static boolean isJumpPressed(Player player) {
-		if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT && player instanceof LocalPlayer clientPlayer) {
-			return clientPlayer.input.jumping;
-		}
-		return false;
+		//Fabric port: resolved through ClientPayloadHelper so this class stays loadable on dedicated servers
+		return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT
+			   && moze_intel.projecte.network.packets.to_client.ClientPayloadHelper.isJumpPressed(player);
 	}
 
 	@Override
