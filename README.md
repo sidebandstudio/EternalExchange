@@ -45,8 +45,6 @@ The core loop is complete and playable. On the list, in no particular order:
 - Server→client config sync for multiplayer consistency
 - New content beyond the classic set — this project is its own thing going forward
 
-Technical notes on the codebase's architecture and its compatibility shims live in [`PORTING.md`](PORTING.md).
-
 ## Building from source
 
 ```bash

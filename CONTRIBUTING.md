@@ -17,7 +17,7 @@ Please confirm the bug happens with only EternalValuePE + Fabric API installed b
 - Target `main`. Keep PRs focused — one fix or feature each.
 - Match the existing code style (tabs, upstream-style formatting). Run `./gradlew build` before pushing; CI must pass.
 - Mark any intentional behavior divergence from classic equivalent-exchange behavior with a `//Fabric port:` comment and explain it in the PR description.
-- Read [`PORTING.md`](PORTING.md) first — it maps every NeoForge-era API to this codebase's replacement. New code should use the same patterns (Fabric API lookups, the `compat` shims, mixin conventions).
+- New code should follow the existing patterns: Fabric API lookups for capabilities, the `moze_intel.projecte.compat` shims for cross-loader concepts, and the established mixin conventions.
 
 ## Development setup
 

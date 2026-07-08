@@ -36,3 +36,4 @@ replay_*.log
 # porting reference material (upstream clone + extracted jar), not part of this repo
 reference/
 ProjectE-1.21.1-PE1.1.0.jar
+PORTING.md

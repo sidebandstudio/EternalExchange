@@ -7,4 +7,4 @@
 - [ ] `./gradlew build` passes locally
 - [ ] Tested in-game (describe what you tested)
 - [ ] Intentional behavior divergences are marked with `//Fabric port:` comments
-- [ ] Follows the patterns in `PORTING.md`
+- [ ] Follows the existing compat/mixin patterns in the codebase
