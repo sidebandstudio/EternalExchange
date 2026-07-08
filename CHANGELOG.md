@@ -1,8 +1,8 @@
 # Changelog
 
-## PE1.1.0 (Fabric) — initial release
+## 1.0.0 — initial release
 
-First public release of EternalValuePE for Minecraft 1.21.1 (Fabric).
+First public release, for Minecraft 1.21.1 on Fabric.
 
 - Complete equivalent-exchange gameplay: EMC engine, Transmutation Table/Tablet, condensers, collectors, relays, matter furnaces, pedestals, alchemical bags/chests
 - Dark/Red Matter tool, weapon, and armor lines with charge and modes; Gem armor with abilities and keybinds

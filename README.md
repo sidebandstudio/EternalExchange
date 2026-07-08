@@ -33,17 +33,17 @@ EternalValuePE is a standalone Fabric mod built around one idea: **everything ha
 
 1. Install Fabric Loader for 1.21.1.
 2. Drop **`EternalValuePE-<version>.jar`** (from [Releases](https://github.com/whoisaldo/EternalValuePE/releases)) and **Fabric API** into `mods/`.
-3. Play. Servers: the same two jars in the server's `mods/` folder.
+3. For servers, place the same two jars in the server's `mods/` directory.
 
 ## Roadmap
 
-The core loop is complete and playable. On the list, in no particular order:
+The core loop is complete and playable. Planned work:
 
 - Recipe viewer integration (EMI/REI) with transmutation support
 - Trinkets support for rings and amulets
 - Fabric transfer-API bridges (machines as pipe targets, amulets filling tanks)
 - Server→client config sync for multiplayer consistency
-- New content beyond the classic set — this project is its own thing going forward
+- Original content beyond the classic equivalent-exchange set
 
 ## Building from source
 
@@ -57,7 +57,7 @@ The jar lands in `build/libs/`. `./gradlew runClient` / `runServer` launch a dev
 
 ## Contributing
 
-Bug reports with reproduction steps are gold. See [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow.
+Bug reports and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines — clear reproduction steps make reports actionable.
 
 ## Origins & License
 

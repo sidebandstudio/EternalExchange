@@ -1,10 +1,10 @@
 # Contributing to EternalValuePE
 
-Thanks for helping make the mod better. Here's how to be effective.
+Thank you for taking the time to contribute.
 
 ## Reporting bugs
 
-Use the [bug report template](https://github.com/whoisaldo/EternalValuePE/issues/new/choose). The three things that make a report actionable:
+Use the [bug report template](https://github.com/whoisaldo/EternalValuePE/issues/new/choose). A report is actionable when it includes:
 
 1. **Exact steps to reproduce** — what you clicked/placed/crafted, in order.
 2. **Expected vs. actual behavior** — including exact numbers for EMC issues.
