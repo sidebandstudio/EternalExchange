@@ -1,0 +1,47 @@
+name: Bug report
+description: Something broke, behaved wrong, or crashed
+labels: [bug]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Mod version
+      placeholder: e.g. PE1.1.0
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Fabric Loader + Fabric API versions; singleplayer or server
+      placeholder: Loader 0.19.3, Fabric API 0.116.13, singleplayer
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Exact steps, in order. For EMC value issues include the item and the expected vs. shown value.
+      placeholder: |
+        1. Place an Energy Condenser
+        2. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs. actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Attach logs/latest.log (and crash-reports/ file if it crashed). Drag & drop files here.
+  - type: checkboxes
+    id: isolated
+    attributes:
+      label: Isolation
+      options:
+        - label: I reproduced this with only EternalValuePE + Fabric API installed (or listed the other mods above)
+          required: false

@@ -3,17 +3,14 @@
 	"id": "projecte",
 	"version": "${version}",
 	"name": "EternalValuePE",
-	"description": "EternalValuePE: a Fabric port of ProjectE (a complete rewrite of EE2 for modern Minecraft versions) by sinkillerj et al., MIT.",
+	"description": "Equivalent-exchange alchemy for Fabric: EMC values for everything, transmutation, condensers, collectors, matter tools and gem armor. Independent project derived from the MIT-licensed ProjectE; not affiliated with it.",
 	"authors": [
-		"SinKillerJ",
-		"MaPePeR",
-		"williewillus",
-		"Lilylicious",
-		"pupnewfster"
+		"whoisaldo"
 	],
 	"contact": {
-		"homepage": "https://github.com/sinkillerj/ProjectE",
-		"sources": "https://github.com/sinkillerj/ProjectE"
+		"homepage": "https://github.com/whoisaldo/EternalValuePE",
+		"sources": "https://github.com/whoisaldo/EternalValuePE",
+		"issues": "https://github.com/whoisaldo/EternalValuePE/issues"
 	},
 	"license": "MIT",
 	"icon": "logo.png",
@@ -72,5 +69,12 @@
 		"fabric-api": "*",
 		"minecraft": "1.21.1",
 		"java": ">=21"
-	}
+	},
+	"contributors": [
+		"SinKillerJ",
+		"MaPePeR",
+		"williewillus",
+		"Lilylicious",
+		"pupnewfster"
+	]
 }

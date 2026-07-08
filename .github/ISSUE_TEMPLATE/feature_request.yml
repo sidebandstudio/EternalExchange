@@ -1,0 +1,15 @@
+name: Feature request
+description: Suggest new content or improvements
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: The idea
+      description: What should be added or changed, and why it fits the mod
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
