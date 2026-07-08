@@ -140,6 +140,16 @@ public class PECore implements ModInitializer {
 		PERecipeConditions.init();
 		PERecipeSerializers.RECIPE_SERIALIZERS.register();
 
+		//Fabric port: upstream ships furnace fuel times as a NeoForge data map (data/neoforge/data_maps/item/furnace_fuels.json),
+		// which Fabric does not read; register the same values with Fabric's fuel registry (feeds vanilla furnaces, the
+		// matter furnaces, and the fuel slot filters alike)
+		net.fabricmc.fabric.api.registry.FuelRegistry.INSTANCE.add(PEItems.ALCHEMICAL_COAL, 6_400);
+		net.fabricmc.fabric.api.registry.FuelRegistry.INSTANCE.add(PEItems.MOBIUS_FUEL, 25_600);
+		net.fabricmc.fabric.api.registry.FuelRegistry.INSTANCE.add(PEItems.AETERNALIS_FUEL, 102_400);
+		net.fabricmc.fabric.api.registry.FuelRegistry.INSTANCE.add(PEBlocks.ALCHEMICAL_COAL, 57_600);
+		net.fabricmc.fabric.api.registry.FuelRegistry.INSTANCE.add(PEBlocks.MOBIUS_FUEL, 230_400);
+		net.fabricmc.fabric.api.registry.FuelRegistry.INSTANCE.add(PEBlocks.AETERNALIS_FUEL, 921_600);
+
 		//Entity capabilities: knowledge + alchemical bags live on players
 		PECapabilities.ALCH_BAG_CAPABILITY.registerForTypes((entity, context) -> new AlchBagImpl((Player) entity), EntityType.PLAYER);
 		PECapabilities.KNOWLEDGE_CAPABILITY.registerForTypes((entity, context) -> new KnowledgeImpl((Player) entity), EntityType.PLAYER);
