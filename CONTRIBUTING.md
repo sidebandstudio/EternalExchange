@@ -1,16 +1,16 @@
-# Contributing to EternalValuePE
+# Contributing to EternalExchange
 
 Thank you for taking the time to contribute.
 
 ## Reporting bugs
 
-Use the [bug report template](https://github.com/whoisaldo/EternalValuePE/issues/new/choose). A report is actionable when it includes:
+Use the [bug report template](https://github.com/whoisaldo/EternalExchange/issues/new/choose). A report is actionable when it includes:
 
 1. **Exact steps to reproduce** — what you clicked/placed/crafted, in order.
 2. **Expected vs. actual behavior** — including exact numbers for EMC issues.
 3. **Logs** — `logs/latest.log`, and `crash-reports/` if it crashed. Attach files, don't screenshot text.
 
-Please confirm the bug happens with only EternalValuePE + Fabric API installed before reporting, or name the other mods involved.
+Please confirm the bug happens with only EternalExchange + Fabric API installed before reporting, or name the other mods involved.
 
 ## Pull requests
 

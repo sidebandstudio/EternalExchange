@@ -2,15 +2,15 @@
 	"schemaVersion": 1,
 	"id": "projecte",
 	"version": "${version}",
-	"name": "EternalValuePE",
+	"name": "EternalExchange",
 	"description": "Equivalent-exchange alchemy for Fabric: EMC values for everything, transmutation, condensers, collectors, matter tools and gem armor. Independent project derived from the MIT-licensed ProjectE; not affiliated with it.",
 	"authors": [
 		"whoisaldo"
 	],
 	"contact": {
-		"homepage": "https://github.com/whoisaldo/EternalValuePE",
-		"sources": "https://github.com/whoisaldo/EternalValuePE",
-		"issues": "https://github.com/whoisaldo/EternalValuePE/issues"
+		"homepage": "https://eternalexchangemod.com",
+		"sources": "https://github.com/whoisaldo/EternalExchange",
+		"issues": "https://github.com/whoisaldo/EternalExchange/issues"
 	},
 	"license": "MIT",
 	"icon": "logo.png",

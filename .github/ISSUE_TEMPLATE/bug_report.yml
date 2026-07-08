@@ -43,5 +43,5 @@ body:
     attributes:
       label: Isolation
       options:
-        - label: I reproduced this with only EternalValuePE + Fabric API installed (or listed the other mods above)
+        - label: I reproduced this with only EternalExchange + Fabric API installed (or listed the other mods above)
           required: false
