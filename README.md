@@ -4,7 +4,7 @@
 
 **Equivalent-exchange alchemy for Fabric.** Learn items, burn them into EMC, and transmute the world back out of it — on Minecraft 1.21.1.
 
-[![Build](https://github.com/whoisaldo/EternalExchange/actions/workflows/build.yml/badge.svg)](https://github.com/whoisaldo/EternalExchange/actions/workflows/build.yml)
+[![Build](https://github.com/sidebandstudio/EternalExchange/actions/workflows/build.yml/badge.svg)](https://github.com/sidebandstudio/EternalExchange/actions/workflows/build.yml)
 [![Minecraft](https://img.shields.io/badge/Minecraft-1.21.1-brightgreen)](https://fabricmc.net/use/installer/)
 [![Loader](https://img.shields.io/badge/Loader-Fabric-blue)](https://fabricmc.net)
 [![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
@@ -32,7 +32,7 @@ EternalExchange is a standalone Fabric mod built around one idea: **everything h
 **Requirements:** Minecraft **1.21.1**, [Fabric Loader](https://fabricmc.net/use/installer/), [Fabric API](https://modrinth.com/mod/fabric-api) for 1.21.1.
 
 1. Install Fabric Loader for 1.21.1.
-2. Drop **`EternalExchange-<version>.jar`** (from [Releases](https://github.com/whoisaldo/EternalExchange/releases)) and **Fabric API** into `mods/`.
+2. Drop **`EternalExchange-<version>.jar`** (from [Releases](https://github.com/sidebandstudio/EternalExchange/releases)) and **Fabric API** into `mods/`.
 3. For servers, place the same two jars in the server's `mods/` directory.
 
 ## Roadmap
@@ -48,7 +48,7 @@ The core loop is complete and playable. Planned work:
 ## Building from source
 
 ```bash
-git clone https://github.com/whoisaldo/EternalExchange.git
+git clone https://github.com/sidebandstudio/EternalExchange.git
 cd EternalExchange
 ./gradlew build        # requires JDK 21
 ```
@@ -63,6 +63,6 @@ Bug reports and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md
 
 EternalExchange began as an independent Fabric port of the MIT-licensed [ProjectE](https://github.com/sinkillerj/ProjectE) (itself a rewrite of Equivalent Exchange 2), and it retains compatibility with that mod's data formats — worlds, configs, and datapacks carry over. Full credit to those projects' authors for the original design; see [LICENSE](LICENSE) for notices.
 
-**EternalExchange is not affiliated with, maintained by, or endorsed by the ProjectE team.** It is developed independently and follows its own direction — report issues [here](https://github.com/whoisaldo/EternalExchange/issues), never upstream.
+**EternalExchange is not affiliated with, maintained by, or endorsed by the ProjectE team.** It is developed independently and follows its own direction — report issues [here](https://github.com/sidebandstudio/EternalExchange/issues), never upstream.
 
 Licensed under the [MIT License](LICENSE). Not affiliated with Mojang or Microsoft.

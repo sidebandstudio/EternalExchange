@@ -9,8 +9,8 @@
 	],
 	"contact": {
 		"homepage": "https://eternalexchangemod.com",
-		"sources": "https://github.com/whoisaldo/EternalExchange",
-		"issues": "https://github.com/whoisaldo/EternalExchange/issues"
+		"sources": "https://github.com/sidebandstudio/EternalExchange",
+		"issues": "https://github.com/sidebandstudio/EternalExchange/issues"
 	},
 	"license": "MIT",
 	"icon": "logo.png",
