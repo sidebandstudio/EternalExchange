@@ -4,7 +4,7 @@ Thank you for taking the time to contribute.
 
 ## Reporting bugs
 
-Use the [bug report template](https://github.com/whoisaldo/EternalExchange/issues/new/choose). A report is actionable when it includes:
+Use the [bug report template](https://github.com/sidebandstudio/EternalExchange/issues/new/choose). A report is actionable when it includes:
 
 1. **Exact steps to reproduce** — what you clicked/placed/crafted, in order.
 2. **Expected vs. actual behavior** — including exact numbers for EMC issues.
